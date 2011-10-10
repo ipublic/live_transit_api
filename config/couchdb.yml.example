@@ -1,0 +1,15 @@
+development:
+  protocol: 'http'
+  host: localhost
+  port: 5984
+  prefix: ride_on_api
+  suffix: dev
+
+production:
+  protocol: 'http'
+  host: prod_ip
+  port: 5984
+  prefix: ride_on_api
+  suffix: prod
+  username: user
+  password: password
