@@ -1,2 +1,3 @@
-class Geometry < CouchRest::Model::Base
+class Geometry
+  include CouchRest::Model::Embeddable
 end
