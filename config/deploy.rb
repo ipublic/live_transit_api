@@ -8,6 +8,17 @@ set :deploy_via, :copy
 set :user, :root
 set :keep_releases, 2
 
+ssh_options[:keys] = [
+  File.join(
+    ENV["HOME"],
+    "proj",
+    "ec2_keypairs",
+    "rideon",
+    "ride-ontime.com",
+    "ride-ontime.com.pem"
+  )
+]
+
 role :web, "107.20.248.237"
 role :app, "107.20.248.237"
 role :db, "107.20.248.237", :primary => true
