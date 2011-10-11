@@ -1,9 +1,9 @@
 class StopsController < ApplicationController
   def index
-    @stops = Stop.all.docs
+    @stops = Stop.all.include_docs
 
     respond_to do |format|
-      format.xml { render :xml => @stops.to_xml }
+      format.xml { render :xml => @stops.docs }
       format.json { render :json => @stops.to_json }
       format.geojson do 
         render({ :json => ({ 
