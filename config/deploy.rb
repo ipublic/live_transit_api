@@ -29,7 +29,7 @@ namespace :deploy do
   task :start do ; end
   task :stop do ; end
   task :restart, :roles => :app, :except => { :no_release => true } do
-     put(db_connection_settings_file, "#{File.join(current_path, 'config', 'couchdb.yml')}", :via => :scp)
+     put(File.read(db_connection_settings_file), "#{File.join(current_path, 'config', 'couchdb.yml')}", :via => :scp)
      run "rvm rvmrc trust #{File.join(current_release)}"
      run "chown apache:apache #{File.join(current_path,'..','..')} -R"
      run "touch #{File.join(current_path,'tmp','restart.txt')}"

@@ -5,3 +5,4 @@ tmp/
 .sass-cache/
 Gemfile.lock
 .*.swp
+config/couchdb.yml
