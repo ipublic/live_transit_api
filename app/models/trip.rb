@@ -20,16 +20,7 @@ class Trip < CouchRest::Model::Base
     view :by_shape_id
     view :by_trip_id
     spatial_view :by_route_and_date, :function => CouchDocLoader["_design/Trip/spatial/by_route_and_date.js"]
-    view :route_shapes, :map => 
-      "function(doc) {
-        if (doc.type && doc.type == 'Trip' && doc.schedules) {
-          emit([doc.route_id, doc.shape_id], 1); 
-        }
-      }",
-      :reduce =>
-      "function(keys, values, rereduce) {
-        return(sum(values));
-      }"
+    view :route_shapes, :map => CouchDocLoader["_design/Trip/views/route_shapes/map.js"], :reduce => CouchDocLoader["_design/Trip/views/route_shapes/reduce.js"]
   end
 
   def to_xml(options = {}, &block)

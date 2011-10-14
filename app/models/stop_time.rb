@@ -11,93 +11,15 @@ class StopTime < CouchRest::Model::Base
 
   design do
     view :by_trip_id
-    view :for_trip_id, :map =>
-    "function (doc) {
-      if (doc.type && doc.type == \"StopTime\") {
-        emit(doc.trip_id, {
-          'stop_name' : doc.stop_name,
-          'stop_code' : doc.stop_code,
-          'stop_id' : doc.stop_id,
-          'arrival_time' : doc.arrival_time,
-          'departure_time' : doc.departure_time,
-          'sequence' : doc.stop_sequence
-        });
-      }
-    }"
+    view :for_trip_id, :map => CouchDocLoader["_design/StopTime/views/for_trip_id/map.js"]
     view :by_trip_id_and_stop_id
-    view :by_trip_geometry, :map =>
-      "function(doc) {
-          if (doc.type && doc.type == \"StopTime\") {
-            emit(doc.trip_id, {
-              \"stop_sequence\": doc.stop_sequence,
-              \"lat\": doc.geometry.coordinates[1],
-              \"lon\": doc.geometry.coordinates[0]
-            });
-          }
-        }"
-   spatial_view :by_stop_and_date, :function =>
-      "function(doc) {
-        if (doc['type'] == 'StopTime' && doc.schedules && doc.arrival_time && doc.departure_time) {
-          for (var i = 0; i < doc.schedules.length; i++) {
-            var startd = parseFloat(doc.schedules[i].day_type.toString() + \".\" + doc.schedules[i].start_date.replace(/-/g, \"\"));
-            var endd = parseFloat(doc.schedules[i].day_type.toString() + \".\" + doc.schedules[i].end_date.replace(/-/g, \"\"));
-            var start_time = parseFloat(doc.stop_id + \".\" + doc.arrival_time.replace(/:/g, \"\"));
-            var end_time = parseFloat(doc.stop_id + \".\" + doc.departure_time.replace(/:/g, \"\"));
+    view :by_trip_geometry, :map => CouchDocLoader["_design/StopTime/views/by_trip_geometry/map.js"]
+    spatial_view :by_stop_and_date, :function => CouchDocLoader["_design/StopTime/spatial/by_stop_and_date.js"]
+    list :multiple_trip_stops, :function => CouchDocLoader["_design/StopTime/lists/multiple_trip_stops.js"]
+    list :single_trip_stops, :function => CouchDocLoader["_design/StopTime/lists/single_trip_stops.js"]
+  end
 
-            emit(
-            {
-             type : 'LineString',
-             coordinates : [
-              [start_time, startd],
-              [end_time, endd]
-             ]
-            },
-            null);
-          }
-        }
-      }"
-
-    list :multiple_trip_stops, :function =>
-    "function (head, req) {
-      start({
-        'headers': {
-          'Content-Type': 'application/json'
-        }
-      });
-      var row = null;
-      var stop_collection = {};
-      while (row = getRow()) {
-        if (!stop_collection[row.key]) {
-          stop_collection[row.key] = [];
-        }
-        stop_collection[row.key].push(row.value);
-      }
-      send(toJSON(stop_collection));
-    }"
-
-    list :single_trip_stops, :function =>
-    "function (head, req) {
-      start({
-        'headers': {
-          'Content-Type': 'application/json'
-        }
-      });
-      var row = null;
-      var isFirst = true;
-      while (row = getRow()) {
-        if (isFirst) {
-          send(\"[\");
-          isFirst = false;
-        } else {
-          send(\",\");
-        }
-        send(toJSON(row.value));
-      }
-      send(\"]\");
-    }"
- end
-
- attr_writer :last_stop_name, :trip
+  attr_writer :last_stop_name, :trip
 
   def self.find_for_stop_and_date(st_id, date_str)
     results = self.by_stop_and_date(:bbox => calculate_today_bbox(st_id,date_str)).all + self.by_stop_and_date(:bbox => calculate_yesterday_bbox(st_id, date_str)).all
