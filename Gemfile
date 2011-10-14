@@ -6,6 +6,8 @@ gem 'yajl-ruby', '1.0.0'
 gem 'rack', '1.3.2'
 gem 'sprockets', '2.0.0'
 gem 'devise', '1.4.8'
+gem 'devise_couch', '0.1.2'
+gem 'orm_adapter'
 
 # Bundle edge Rails instead:
 # gem 'rails',     :git => 'git://github.com/rails/rails.git'
