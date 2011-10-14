@@ -17,7 +17,7 @@ class CouchDocLoader
   end
 
   def self.read_document(name)
-    path = File.join(File.dirname(__FILE__), "..", "..", "couch_docs", name)
+    path = File.join(Rails.root.to_s, "couch_docs", name)
     doc_file = File.open(path, "r")
     content = doc_file.read
     doc_file.close
