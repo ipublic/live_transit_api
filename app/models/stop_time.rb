@@ -22,7 +22,7 @@ class StopTime < CouchRest::Model::Base
   attr_writer :last_stop_name, :trip
 
   def self.find_for_stop_and_date(st_id, date_str)
-    results = self.by_stop_and_date(:bbox => calculate_today_bbox(st_id,date_str)).all + self.by_stop_and_date(:bbox => calculate_yesterday_bbox(st_id, date_str)).all
+    results = self.by_stop_and_date(:bbox => calculate_day_bbox(st_id,date_str)).all + self.by_stop_and_date(:bbox => calculate_previous_day_bbox(st_id, date_str)).all
     associated_trips = Trip.by_trip_id.keys(results.map(&:trip_id)).inject({}) do |h, t|
       h[t.trip_id] = t.last_stop_name
       h
@@ -33,7 +33,44 @@ class StopTime < CouchRest::Model::Base
     results
   end
 
-  def self.calculate_today_bbox(st_id, date_str)
+  def self.date_of_day_bbox(st_id, date_str)
+    w_day = Date.strptime(date_str, "%Y-%m-%d").wday
+    day_val = date_str.gsub("-", "")
+    date_key = "#{w_day}.#{day_val}"
+    start_t = "0"
+    end_t = "475959"
+    start_x = "#{st_id}.#{start_t}"
+    end_x = "#{st_id}.#{end_t}"
+    [start_x, date_key, end_x, date_key]
+  end
+
+  def self.date_after_day_bbox(st_id, date_str)
+    todays_date = Date.strptime(date_str, "%Y-%m-%d")
+    w_day = (todays_date + 1).wday
+    day_val = (todays_date + 1).strftime("%Y%m%d")
+    day_val = date_str.gsub("-", "")
+    date_key = "#{w_day}.#{day_val}"
+    start_t = "0"
+    end_t = "235959"
+    start_x = "#{st_id}.#{start_t}"
+    end_x = "#{st_id}.#{end_t}"
+    [start_x, date_key, end_x, date_key]
+  end
+
+  def self.date_before_day_bbox(st_id, date_str)
+    todays_date = Date.strptime(date_str, "%Y-%m-%d")
+    w_day = (todays_date - 1).wday
+    day_val = (todays_date - 1).strftime("%Y%m%d")
+    day_val = date_str.gsub("-", "")
+    date_key = "#{w_day}.#{day_val}"
+    start_t = "240000"
+    end_t = "715959"
+    start_x = "#{st_id}.#{start_t}"
+    end_x = "#{st_id}.#{end_t}"
+    [start_x, date_key, end_x, date_key]
+  end
+
+  def self.calculate_day_bbox(st_id, date_str)
     date_parts = date_str.split("\s")
     w_day = Date.strptime(date_parts.first, "%Y-%m-%d").wday
     day_val = date_parts[0].gsub("-", "")
@@ -52,7 +89,7 @@ class StopTime < CouchRest::Model::Base
     [start_x, date_key, end_x, date_key]
   end
 
-  def self.calculate_yesterday_bbox(st_id, date_str)
+  def self.calculate_previous_day_bbox(st_id, date_str)
     date_parts = date_str.split("\s")
     todays_date = Date.strptime(date_parts.first, "%Y-%m-%d")
     w_day = (todays_date - 1).wday
