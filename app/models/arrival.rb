@@ -13,7 +13,7 @@ class Arrival
     @attributes[:scheduled_arrivals] = scheduled_arrivals
   end
 
-  def to_json
+  def to_json(opts = {})
     attributes.to_json
   end
 
