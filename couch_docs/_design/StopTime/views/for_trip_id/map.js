@@ -6,7 +6,7 @@ function (doc) {
         'stop_id' : doc.stop_id,
         'arrival_time' : doc.arrival_time,
         'departure_time' : doc.departure_time,
-        'sequence' : doc.stop_sequence
+        'stop_sequence' : doc.stop_sequence
         });
   }
 }
