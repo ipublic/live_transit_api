@@ -12,11 +12,13 @@ class StopTime < CouchRest::Model::Base
   design do
     view :by_trip_id
     view :for_trip_id, :map => CouchDocLoader["_design/StopTime/views/for_trip_id/map.js"]
+    view :for_stop_id, :map => CouchDocLoader["_design/StopTime/views/for_stop_id/map.js"]
     view :by_trip_id_and_stop_id
     view :by_trip_geometry, :map => CouchDocLoader["_design/StopTime/views/by_trip_geometry/map.js"]
     spatial_view :by_stop_and_date, :function => CouchDocLoader["_design/StopTime/spatial/by_stop_and_date.js"]
     list :multiple_trip_stops, :function => CouchDocLoader["_design/StopTime/lists/multiple_trip_stops.js"]
     list :single_trip_stops, :function => CouchDocLoader["_design/StopTime/lists/single_trip_stops.js"]
+    list :single_stop_stops, :function => CouchDocLoader["_design/StopTime/lists/single_stop_stops.js"]
   end
 
   attr_writer :last_stop_name, :trip

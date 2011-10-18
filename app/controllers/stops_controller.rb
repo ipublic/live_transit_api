@@ -19,8 +19,8 @@ class StopsController < ApplicationController
     @stop = Stop.find_by_stop_code(params[:id])
 
     respond_to do |format|
-      format.xml { render :xml => @stop }
-      format.json { render :json => @stop }
+      format.xml { render :xml => @stop, :methods => :stop_times }
+      format.json { render :json => @stop, :methods => :stop_times }
     end
   end
 
