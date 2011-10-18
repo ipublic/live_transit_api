@@ -13,3 +13,14 @@ production:
   suffix: prod
   username: user
   password: password
+
+authentication:
+  prefix: ride_on_api_auth
+  suffix: dev
+
+replication_target:
+  protocol: 'http'
+  host: localhost
+  port: 5984
+  prefix: ride_on_api
+  suffix: dev
