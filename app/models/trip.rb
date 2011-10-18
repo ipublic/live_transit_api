@@ -13,6 +13,7 @@ class Trip < CouchRest::Model::Base
   property :last_stop_name, String
 
   attr_writer :stops
+  attr_reader :shape
 
   design do
     view :by_route_id_and_direction_id
@@ -24,9 +25,10 @@ class Trip < CouchRest::Model::Base
   end
 
   def to_xml(options = {}, &block)
+    additional_options = (options[:include] == :geometry) ? { :methods => [:stops, :geometry] } : { :methods => :stops }
     ActiveModel::Serializers::Xml::Serializer.new(
       self,
-      options.merge({:methods => :stops})
+      options.merge(additional_options)
     ).serialize(&block)
   end
 
@@ -34,8 +36,12 @@ class Trip < CouchRest::Model::Base
     ShapePoint.single_shape(:key => self.shape_id, :view => "by_shape_id").all
   end
 
-  def to_json
-    attributes.merge(:stops => stops).to_json
+  def to_json(options = {})
+    additional_options = { :stops => stops }
+    if options[:include] == :geometry
+      additional_options[:geometry] = geometry
+    end
+    attributes.merge(additional_options).to_json
   end
 
   def stops
