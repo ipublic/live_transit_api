@@ -3,8 +3,9 @@ class ArrivalsController < ApplicationController
     @arrival = Arrival.find(params[:id])
 
     respond_to do |format|
-      format.xml { render :xml => @arrival }
+      format.html { render :json => @arrival, :content_type => "application/json" }
       format.json { render :json => @arrival }
+      format.xml { render :xml => @arrival }
     end
   end
 end
