@@ -1,0 +1,17 @@
+= image_tag 'logo.jpg', :alt => "Ride On Logo"
+
+%p RIDE ON is Montgomery County, Maryland's public transportation bus service. RIDE ON includes over 300 county-owned buses and vehicles that complete over 30 million trips per year. Montgomery County Department of Transportation (MCDOT), Transit Services has equipped RIDE ON buses with Computer Aided Dispatching (CAD) and Automatic Vehicle Location (AVL) system. RIDE ON's SmartTraveler CAD/AVL, based on ACS OrbCAD technology, reports real time position vehicle and related information. MCDOT manages over 5,000 active bus stops, 80 routes and associated schedules using Geographic Information System (GIS) technology.
+
+%p Transit Services has developed an open API that makes bus schedule and position data - as reported by the SmartTraveler and GIS systems - programmatically available to both the County and public in the form of interoperable Web services.
+
+%p  
+  Using this API, you may access read-only information on:
+  %ul
+    %li Bus stops
+    %li Bus routes and trips
+    %li Schedules
+    %li Bus positions
+    %li Estimated arrival times
+    %li Bus stop sign messages
+
+%p The API uses open software and data standards to publish transit information using HTTP protocol using the RESTful pattern. For example, standards supported include General Transit Feed Specification (GTFS) and GTFS-realtime for structuring transit content and Dublin Core Elemental Set (DCES) for metadata. The Apache CouchDB database provides efficient, high-performance access to transit information.

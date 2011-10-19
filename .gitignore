@@ -6,3 +6,4 @@ tmp/
 Gemfile.lock
 .*.swp
 config/couchdb.yml
+public/assets
