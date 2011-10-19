@@ -5,7 +5,7 @@ class ArrivalsController < ApplicationController
     respond_to do |format|
       format.html { render :json => @arrival, :content_type => "application/json" }
       format.json { render :json => @arrival }
-      format.xml { render :xml => @arrival }
+      format.xml { render :xml => @arrival, :dasherize => false }
     end
   end
 end

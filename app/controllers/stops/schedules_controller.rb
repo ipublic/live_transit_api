@@ -4,7 +4,7 @@ class Stops::SchedulesController < ApplicationController
 
     respond_to do |format|
       format.html { render :json => @stop_times.to_json, :content_type => "application/json" }
-      format.xml { render :xml => @stop_times.to_xml }
+      format.xml { render :xml => @stop_times.to_xml(:dasherize => false) }
       format.json { render :json => @stop_times.to_json }
     end
   end

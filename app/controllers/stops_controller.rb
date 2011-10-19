@@ -4,7 +4,7 @@ class StopsController < ApplicationController
 
     respond_to do |format|
       format.html { render :json => @stops.to_json, :content_type => "application/json" }
-      format.xml { render :xml => @stops.docs }
+      format.xml { render :xml => @stops.docs, :dasherize => false }
       format.json { render :json => @stops.to_json }
       format.geojson do 
         render({ :json => ({ 
@@ -21,7 +21,7 @@ class StopsController < ApplicationController
 
     respond_to do |format|
       format.html { render :json => @stop, :methods => :stop_times, :content_type => "application/json" }
-      format.xml { render :xml => @stop, :methods => :stop_times }
+      format.xml { render :xml => @stop, :methods => :stop_times, :dasherize => false }
       format.json { render :json => @stop, :methods => :stop_times }
     end
   end

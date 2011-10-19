@@ -5,7 +5,7 @@ class RoutesController < ApplicationController
     respond_to do |format|
       format.html { render :json => @routes.to_json, :content_type => "application/json" }
       format.json { render :json => @routes.to_json }
-      format.xml { render :xml => @routes.to_xml }
+      format.xml { render :xml => @routes.to_xml(:dasherize => false) }
     end
   end
 
@@ -14,7 +14,7 @@ class RoutesController < ApplicationController
 
     respond_to do |format|
       format.html { render :json => @route.full_json, :content_type => "application/json" }
-      format.xml { render :xml => @route, :methods => [:trips, :shapes] }
+      format.xml { render :xml => @route, :methods => [:trips, :shapes], :dasherize => false }
       format.json { render :json => @route.full_json }
       format.geojson { render :json => @route.to_geojson }
     end

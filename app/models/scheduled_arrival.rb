@@ -28,7 +28,7 @@ class ScheduledArrival
     @attributes[:stop_id] = st.stop_id
     @attributes[:route_id] = trip.route_id
     @attributes[:route_name] = route_names[trip.route_id]
-    @attributes[:last_stop_name] = trip.last_stop_name
+    @attributes[:destination_stop_name] = trip.last_stop_name
     @attributes[:arrival_time] = offset_time(st.arrival_time, offset)
     @attributes[:departure_time] = offset_time(st.departure_time, offset)
     @attributes[:trip_id] = st.trip_id
