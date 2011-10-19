@@ -1,5 +1,3 @@
-load "deploy/assets"
-
 set :application, "live_transit_api"
 set :repository,  "git@github.com:ipublic/live_transit_api.git"
 set :deploy_to, "/var/www/live_transit_api"
@@ -12,6 +10,7 @@ set :keep_releases, 2
 
 set :db_connection_settings_file, File.join(File.dirname(__FILE__), "couchdb.yml")
 
+default_run_options[:shell] = false
 ssh_options[:keys] = [
   File.join(
     ENV["HOME"],
@@ -34,6 +33,7 @@ namespace :deploy do
      put(File.read(db_connection_settings_file), "#{File.join(current_path, 'config', 'couchdb.yml')}", :via => :scp)
      run "rvm rvmrc trust #{File.join(current_release)}"
      run "cd #{current_release}; RAILS_ENV=production bundle install"
+     run "cd #{current_release}; RAILS_ENV=production bundle exec rake assets:precompile"
      run "chown apache:apache #{File.join(current_path,'..','..')} -R"
      run "touch #{File.join(current_path,'tmp','restart.txt')}"
   end
