@@ -30,9 +30,10 @@ class VehiclePosition < CouchRest::Model::Base
     rec_id = props['vehicle_id']
     record = self.by_vehicle_id.key(rec_id).first
     if record.nil?
-      self.create!(props)
+      record = self.create!(props)
+    else
+      record.update_attributes(props)
     end
-    record.update_attributes!(props)
     record
   end
 
