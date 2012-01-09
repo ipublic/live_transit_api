@@ -1,4 +1,5 @@
 class StopsController < ApplicationController
+  before_filter :authenticate_user!
   def index
     @stops = Stop.all.include_docs
 

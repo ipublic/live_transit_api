@@ -1,4 +1,5 @@
 class VehiclePositionsController < ApplicationController
+  before_filter :authenticate_user!
   def create
     @vehicle_position = VehiclePosition.create_or_update(params[:NewDataSet][:Table])
 

@@ -1,4 +1,5 @@
 class ArrivalsController < ApplicationController
+  before_filter :authenticate_user!
   def show
     @arrival = Arrival.find(params[:id])
 
