@@ -1,0 +1,8 @@
+!!! XML
+%route
+  = render :partial => "routes/route", :object => @route
+  %trips{ :type => "array" }
+    = render :partial => "trips/trip_item", :collection => @route.trips
+  %shapes{ :type => "array" }
+    - @route.shapes.each do |shape|
+      != shape.to_xml({:root => "shape", :skip_instruct => true})

@@ -37,7 +37,7 @@ class Trip < CouchRest::Model::Base
   end
 
   def to_json(options = {})
-    additional_options = { :stops => stops }
+    additional_options = { :stop_times => stops }
     if options[:include] == :geometry
       additional_options[:geometry] = geometry
     end
@@ -62,5 +62,9 @@ class Trip < CouchRest::Model::Base
         :geometry => self.geometry
       }]
     }.to_json
+  end
+
+  def to_param
+    self.trip_id
   end
 end

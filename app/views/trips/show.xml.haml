@@ -1,0 +1,4 @@
+!!! XML
+%trip
+  = render :partial => "trips/trip", :object => @trip
+  != @trip.geometry.to_xml(:root => "geometry", :skip_instruct => true)

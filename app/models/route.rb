@@ -39,13 +39,6 @@ class Route < CouchRest::Model::Base
     attributes.merge(:trips => trips, :shapes => shapes).to_json
   end
 
-  def to_xml(options = {}, &block)
-    ActiveModel::Serializers::Xml::Serializer.new(
-      self,
-      options
-    ).serialize(&block)
-  end
-
   def to_geojson
     {
       :type => "FeatureCollection",
@@ -62,5 +55,9 @@ class Route < CouchRest::Model::Base
         }
       end
     }.to_json
+  end
+
+  def to_param
+    self.route_short_name
   end
 end
