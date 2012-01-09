@@ -18,9 +18,9 @@ namespace :deploy do
   task :stop do ; end
   task :restart, :roles => :app, :except => { :no_release => true } do
      run "rvm rvmrc trust #{File.join(current_release)}"
+     run "ln -s #{shared_path}/config/couchdb.yml #{current_path}/config/couchdb.yml"
 #     run "cd #{current_release}; RAILS_ENV=production bundle install"
 #     run "cd #{current_release}; RAILS_ENV=production bundle exec rake assets:precompile"
-     run "ln -s #{shared_path}/config/couchdb.yml #{current_path}/config/couchdb.yml"
      run "chown realtimewebsvcs:rvm #{File.join(current_path,'..','..')} -R"
      run "touch #{File.join(current_path,'tmp','restart.txt')}"
   end
