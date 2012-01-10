@@ -11,9 +11,11 @@ class VehiclePosition < CouchRest::Model::Base
   property :incident_desc, String
   property :last_stop_deviation, String
   property :predicted_deviation, String
-  property :previous_stop_id, String
-  property :next_stop_id, String
+  property :previous_stop_code, String
+  property :next_stop_code, String
   property :next_scheduled_stop_time, String
+  property :previous_sequence, Integer
+  property :next_sequence, Integer
   property :incident_date_time, String
   property :last_scheduled_time, String
   property :status_scheduled_time, String

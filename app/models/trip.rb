@@ -44,6 +44,44 @@ class Trip < CouchRest::Model::Base
     attributes.merge(additional_options).to_json
   end
 
+  def full_json(enc)
+   encoded_stops = stops.map do |stp|
+     stp.merge({
+        :stop => { 
+          :link => enc.resolver.url_for(:controller => :stops, :action => :show, :id => stp["stop_code"])
+        }
+     })
+   end
+   self.attributes.merge({
+      :stops => encoded_stops.as_json,
+      :route => {
+        :link => enc.resolver.url_for(:controller => :routes, :action => :show, :id => self.route_id)
+      },
+      :geometry => geometry.as_json
+    }).as_json
+  end
+
+  def as_json(opts = {})
+    encoder = opts[:encoder]
+    additional_options = { }
+    if opts[:include] == :geometry
+      additional_options[:geometry] = geometry
+    end
+    if (!encoder.nil? && encoder.kind_of?(LinkedEncoder))
+      resolver = encoder.resolver
+      additional_options[:stop_times] = stops.map do |stp|
+        stp.merge({
+        :stop => { 
+          :link => resolver.url_for(:controller => :stops, :action => :show, :id => stp["stop_code"]) 
+        }
+        })
+      end
+      attributes.merge({:link => resolver.url_for(self)}.merge(additional_options)).as_json
+    else
+      super(opts)
+    end
+  end
+
   def stops
     @stops ||= StopTime.single_trip_stops(:key => self.trip_id, :view => "for_trip_id").all
   end

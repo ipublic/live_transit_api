@@ -35,8 +35,27 @@ class Route < CouchRest::Model::Base
     @shapes = ShapePoint.many_shapes(:keys => routes_shapes, :view => :by_shape_id).all
   end
 
-  def full_json
-    attributes.merge(:trips => trips, :shapes => shapes).to_json
+  def full_json(encoder)
+    attributes.merge(:trips => trips.as_json(:encoder => encoder), :shapes => shapes.as_json(:encoder => encoder)).as_json
+  end
+
+  def as_json(opts = {})
+    encoder = opts[:encoder]
+    if (!encoder.nil? && encoder.kind_of?(LinkedEncoder))
+      resolver = encoder.resolver
+      attributes.merge(:link => resolver.url_for(self)).as_json
+    else
+      super(opts)
+    end
+  end
+
+  def to_json(options = {})
+    resolver = options[:url_resolver]
+    if resolver
+      attributes.merge(:link => resolver.url_for(self)).to_json
+    else
+      super
+    end
   end
 
   def to_geojson
@@ -58,6 +77,6 @@ class Route < CouchRest::Model::Base
   end
 
   def to_param
-    self.route_short_name
+    self.route_id
   end
 end
