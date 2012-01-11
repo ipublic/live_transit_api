@@ -24,30 +24,6 @@ class Stop < CouchRest::Model::Base
     StopTime.single_stop_stops(:key => self.stop_id, :view => :for_stop_id).all
   end
 
-  def as_json(opts = {})
-    encoder = opts[:encoder]
-    if (!encoder.nil? && encoder.kind_of?(LinkedEncoder))
-      resolver = encoder.resolver
-      attributes.merge({ :link => resolver.url_for(self) }).as_json
-    else
-      super(opts)
-    end
-  end
-
-  def full_json(enc)
-   encoded_times = stop_times.map do |stp|
-     stp.merge({
-        :trip => { 
-          :link => enc.resolver.url_for(:controller => :trips, :action => :show, :id => stp["trip_id"])
-        },
-        :route => { 
-          :link => enc.resolver.url_for(:controller => :routes, :action => :show, :id => stp["route_id"])
-        }
-     })
-   end
-   attributes.merge(:stop_times => encoded_times.as_json)
-  end
-
   def to_param
     self.stop_code
   end

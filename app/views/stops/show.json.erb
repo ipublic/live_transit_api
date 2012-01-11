@@ -1,0 +1,6 @@
+{
+<%= render :partial => "stops/stop", :object => @stop %>,
+"stop_times" : [
+<%= render :partial => "stops/stop_time", :collection => @stop.stop_times, :spacer_template => "shared/json_spacer" %>
+]
+}

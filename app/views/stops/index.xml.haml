@@ -1,7 +1,7 @@
 !!! XML
 %stops{ :type => "array" }
   - @stops.each do |stop_item|
-    %stop{ :link => url_for(stop_item) }
+    %stop{ :uri => url_for(stop_item) }
       %stop_id= stop_item.stop_id
       %stop_code= stop_item.stop_name
       %stop_name= stop_item.stop_name

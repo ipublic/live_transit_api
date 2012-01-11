@@ -1,0 +1,13 @@
+{
+  "arrival_time" : <%=json stop_time["arrival_time"] %>,
+  "departure_time" : <%=json stop_time["arrival_time"] %>,
+  "stop_sequence" : <%= json stop_time["stop_sequence"] %>,
+  "route" : {
+    "id" : <%=json stop_time["route_id"] %>,
+    "uri" : <%=json url_for(:controller => :routes, :action => :show, :id => stop_time["route_id"]) %>
+   },
+  "trip" : {
+    "id" : <%=json stop_time["trip_id"] %>,
+    "uri" : <%=json url_for(:controller => :trips, :action => :show, :id => stop_time["trip_id"]) %>
+   }
+ }

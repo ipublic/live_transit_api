@@ -4,8 +4,11 @@ class TripsController < ApplicationController
     @trip = Trip.by_trip_id(:key => params[:id]).first
 
     respond_to do |format|
-      format.html { render :json => @trip.full_json(LinkedEncoder.new(self)), :content_type => "application/json" }
-      format.json { render :json => @trip.full_json(LinkedEncoder.new(self)) }
+      format.html {
+        self.formats = [:json]
+        render :content_type => "application/json"
+      }
+      format.json
       format.xml
     end
   end

@@ -1,5 +1,4 @@
 !!! XML
 %trip
-  %route{ :link => url_for(:controller => :routes, :id => @trip.route_id, :action => :show) }
   = render :partial => "trips/trip", :object => @trip
   != @trip.geometry.to_xml(:root => "geometry", :skip_instruct => true)

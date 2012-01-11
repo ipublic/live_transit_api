@@ -4,9 +4,12 @@ class StopsController < ApplicationController
     @stops = Stop.all.docs
 
     respond_to do |format|
-      format.html { render :json => @stops.as_json(:encoder => LinkedEncoder.new(self)), :content_type => "application/json" }
+      format.html {
+        self.formats = [:json]
+        render :content_type => "application/json"
+      }
       format.xml
-      format.json { render :json => @stops.as_json(:encoder => LinkedEncoder.new(self)) }
+      format.json 
       format.geojson do 
         render({ :json => ({ 
           :type => "FeatureCollection",
@@ -21,9 +24,12 @@ class StopsController < ApplicationController
     @stop = Stop.find_by_stop_code(params[:id])
 
     respond_to do |format|
-      format.html { render :json => @stop.full_json(LinkedEncoder.new(self)), :content_type => "application/json" }
+      format.html {
+        self.formats = [:json]
+        render :content_type => "application/json"
+      }
       format.xml
-      format.json { render :json => @stop.full_json(LinkedEncoder.new(self)) }
+      format.json
     end
   end
 

@@ -14,10 +14,10 @@
   %stop_times{:type => "array"}
     - @stop.stop_times.each do |stime|
       %stop_time
-        %route_id= stime["route_id"]
-        %trip_id= stime["trip_id"]
         %arrival_time= stime["arrival_time"]
         %departure_time= stime["departure_time"]
         %stop_sequence{ :type => "integer" }= stime["stop_sequence"]
         %trip{ :link => url_for(:controller => :trips, :action => :show, :id => stime["trip_id"]) }
+          %trip_id= stime["trip_id"]
         %route{ :link => url_for(:controller => :routes, :action => :show, :id => stime["route_id"]) }
+          %route_id= stime["route_id"]

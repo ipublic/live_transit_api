@@ -1,0 +1,9 @@
+{
+<%= render :partial => "routes/route", :object => @route %>,
+"trips" : [
+  <%= render :partial => "trips/trip_item", :collection => @route.trips, :spacer_template => "shared/json_spacer" %>  
+],
+"shapes" : [
+ <%= raw @route.shapes.map(&:to_json).join(",") %>
+]
+}

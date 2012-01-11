@@ -43,7 +43,7 @@ class Route < CouchRest::Model::Base
     encoder = opts[:encoder]
     if (!encoder.nil? && encoder.kind_of?(LinkedEncoder))
       resolver = encoder.resolver
-      attributes.merge(:link => resolver.url_for(self)).as_json
+      attributes.merge(:uri => resolver.url_for(self)).as_json
     else
       super(opts)
     end
