@@ -8,8 +8,6 @@ set :deploy_via, :copy
 set :user, :root
 set :keep_releases, 2
 
-set :db_connection_settings_file, File.join(File.dirname(__FILE__), "couchdb.yml")
-
 default_run_options[:shell] = false
 ssh_options[:keys] = [
   File.join(
@@ -30,7 +28,7 @@ namespace :deploy do
   task :start do ; end
   task :stop do ; end
   task :restart, :roles => :app, :except => { :no_release => true } do
-     put(File.read(db_connection_settings_file), "#{File.join(current_path, 'config', 'couchdb.yml')}", :via => :scp)
+     run "ln -s #{shared_path}/config/couchdb.yml #{current_path}/config/couchdb.yml"
      run "rvm rvmrc trust #{File.join(current_release)}"
      run "cd #{current_release}; RAILS_ENV=production bundle install"
      run "cd #{current_release}; RAILS_ENV=production bundle exec rake assets:precompile"
