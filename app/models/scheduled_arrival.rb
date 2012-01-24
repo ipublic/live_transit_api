@@ -32,8 +32,13 @@ class ScheduledArrival
     @attributes[:arrival_time] = offset_time(st.arrival_time, offset)
     @attributes[:departure_time] = offset_time(st.departure_time, offset)
     @attributes[:trip_id] = st.trip_id
-    @attributes[:arrival_display_time] = display_time(st.arrival_time)
-    @attributes[:message] = "#{@attributes[:arrival_display_time]} #{@attributes[:route_name]} to #{trip.last_stop_name}"
+    @attributes[:trip_headsign] = trip.trip_headsign
+    @attributes[:scheduled_display_time] = display_time(st.arrival_time)
+    @attributes[:message] = "#{@attributes[:scheduled_display_time]} #{@attributes[:route_name]} to #{trip.last_stop_name}"
+  end
+
+  def [](key)
+    attributes[key]
   end
 
   def to_json

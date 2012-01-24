@@ -1,5 +1,7 @@
 class Arrival
-  attr_reader :attributes
+  attr_reader :stop
+  attr_reader :scheduled_arrivals
+  attr_reader :calculated_arrivals
 
   def self.find(st_code, limit=5)
     stop = Stop.by_stop_code(:key => st_code).first
@@ -8,18 +10,9 @@ class Arrival
     Arrival.new(stop, scheduled_arrivals, calculated_arrivals)
   end
 
-  def initialize(stop, scheduled_arrivals, calculated_arrivals)
-    @attributes = {}
-    @attributes[:stop] = stop
-    @attributes[:scheduled_arrivals] = scheduled_arrivals
-    @attributes[:calculated_arrivals] = calculated_arrivals
-  end
-
-  def to_json(opts = {})
-    attributes.to_json
-  end
-
-  def to_xml(opts = {})
-    attributes.to_xml(opts.merge({:root => "arrival"}))
+  def initialize(stop, s_arrivals, c_arrivals)
+    @stop = stop
+    @scheduled_arrivals = s_arrivals
+    @calculated_arrivals = c_arrivals
   end
 end

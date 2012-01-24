@@ -29,13 +29,14 @@ class CalculatedArrival
 
   def initialize(trip, route_names, attr = {})
     @attributes = attr.dup
+    @attributes[:trip_id] = trip.trip_id
     @attributes[:route_name] = route_names[trip.route_id]
     @attributes[:route_id] = trip.route_id
     @attributes[:destination_stop_name] = trip.last_stop_name
     @attributes[:trip_headsign] = trip.trip_headsign
-    @attributes[:scheduled_time] = attr["scheduled_time"]
-    @attributes[:display_time] = attr["scheduled_time"].strftime("%l:%M%p")
-    @attributes[:message] = "#{@attributes[:display_time]} #{@attributes[:route_name]} to #{trip.last_stop_name}"
+    @attributes[:calculated_time] = attr["scheduled_time"]
+    @attributes[:calculated_display_time] = attr["scheduled_time"].strftime("%l:%M%p")
+    @attributes[:message] = "#{@attributes[:calculated_display_time]} #{@attributes[:route_name]} to #{trip.last_stop_name}"
   end
 
   def [](key)
