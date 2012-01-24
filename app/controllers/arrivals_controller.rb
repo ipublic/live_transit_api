@@ -9,7 +9,7 @@ class ArrivalsController < ApplicationController
         render :content_type => "application/json"
       }
       format.json
-      format.xml { render :xml => @arrival, :dasherize => false }
+      format.xml
     end
   end
 end

@@ -3,9 +3,8 @@
     "stop_id" : <%=json @arrival.stop.stop_id %>,  
     "stop_code" : <%=json @arrival.stop.stop_code %>,  
     "stop_name" : <%=json @arrival.stop.stop_name %>,  
-    "stop_lat" : <%=json @arrival.stop.stop_lat %>,  
-    "stop_lon" : <%=json @arrival.stop.stop_lon %>,  
-    "url" : <%=json url_for(@arrival.stop) %>  
+    "geometry" : <%=json @arrival.stop.geometry %>,
+    "url" : <%=json url_for(@arrival.stop) %>
   },
   "scheduled_arrivals" : [
   <%= render :partial => "arrivals/scheduled_arrival", :collection => @arrival.scheduled_arrivals, :spacer_template => "shared/json_spacer" %>

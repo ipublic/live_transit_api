@@ -9,6 +9,7 @@
     "trip_headsign" : <%= json scheduled_arrival[:trip_headsign] %>,
     "url" : <%= json url_for(:controller => :trips, :action => :show, :id => scheduled_arrival[:trip_id]) %>
    },
+   "destination_stop_name" : <%=json scheduled_arrival[:destination_stop_name] %>,
    "scheduled_time" : <%=json scheduled_arrival[:arrival_time] %>,
    "scheduled_display_time" : <%=json scheduled_arrival[:scheduled_display_time] %>,
    "message" : <%=json scheduled_arrival[:message] %>

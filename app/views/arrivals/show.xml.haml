@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+%arrival
+  %stop{ :url => url_for(@arrival.stop) }
+    %stop_id= @arrival.stop.stop_id
+    %stop_code= @arrival.stop.stop_code
+    %stop_name= @arrival.stop.stop_name
+    != @arrival.stop.geometry.to_xml(:root => "geometry", :skip_instruct => "true")
+
+  %scheduled_arrivals{ :type => "array" }
+    - @arrival.scheduled_arrivals.each do |sa|
+      %scheduled_arrival
+        %route{ :url => url_for(:controller => :routes, :action => :show, :id => sa[:route_id]) }
+          %route_id= sa[:route_id]
+          %route_name= sa[:route_name]
+        %trip{ :url => url_for(:controller => :trips, :action => :show, :id => sa[:trip_id]) }
+          %trip_id= sa[:trip_id]
+          %trip_headsign= sa[:trip_headsign]
+        %destination_stop_name= sa[:destination_stop_name]
+        %scheduled_time= sa[:arrival_time]
+        %scheduled_display_time= sa[:scheduled_display_time]
+        %message= sa[:message]
+
+  %calculated_arrivals{ :type => "array" }
+    - @arrival.calculated_arrivals.each do |ca|
+      %calculated_arrival
+        %route{ :url => url_for(:controller => :routes, :action => :show, :id => ca[:route_id]) }
+          %route_id= ca[:route_id]
+          %route_name= ca[:route_name]
+        %trip{ :url => url_for(:controller => :trips, :action => :show, :id => ca[:trip_id]) }
+          %trip_id= ca[:trip_id]
+          %trip_headsign= ca[:trip_headsign]
+        %destination_stop_name= ca[:destination_stop_name]
+        %calculated_time{:type => "datetime"}= ca[:calculated_time]
+        %calculated_display_time= ca[:calculated_display_time]
+        %message= ca[:message]
+
