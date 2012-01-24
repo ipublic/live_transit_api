@@ -26,6 +26,7 @@ class VehiclePosition < CouchRest::Model::Base
     allowable_stops.map do |ast|
       offset = get_offset(ast["arrival_time"]) - bottom_offset - (predicted_deviation * 60)
       ast.merge({ 
+        "trip_id" => trip.trip_id,
         "last_stop_name" => trip.last_stop_name,
         "scheduled_time" => schedule_time - offset
       })
