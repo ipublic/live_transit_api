@@ -5,18 +5,40 @@ class VehiclePosition < CouchRest::Model::Base
   property :speed, String
   property :heading, String
   property :vehicle_position_date_time, String
+  property :incident_date_time, String
+  property :last_scheduled_time, String
   property :trip_id, String
-  property :last_stop_deviation, String
-  property :predicted_deviation, String
+  property :last_stop_deviation, Integer
+  property :predicted_deviation, Integer
   property :previous_sequence, Integer
-  property :next_sequence, Integer
 
   design do
     view :by_vehicle_id
   end
 
-  def to_xml(options = {}, &block)
-    ActiveModel::Serializers::Xml::Serializer.new(self, options).serialize(&block)
+  def calculate_adjusted_stops(trip)
+    return([]) if self.predicted_deviation == 63
+    allowable_stops = trip.stops.reject do |st|
+      st["stop_sequence"] < previous_sequence
+    end
+    bottom_offset = get_offset(allowable_stops.min { |ast| ast["stop_sequence"] }["arrival_time"])
+    schedule_time = parse_mssql_date_time(last_scheduled_time)
+    allowable_stops.map do |ast|
+      offset = get_offset(ast["arrival_time"]) - bottom_offset - (predicted_deviation * 60)
+      ast.merge({ 
+        "last_stop_name" => trip.last_stop_name,
+        "scheduled_time" => schedule_time - offset
+      })
+    end
+  end
+
+  def parse_mssql_date_time(dt_val)
+    DateTime.strptime(dt_val, "%FT%T%:z")
+  end
+
+  def get_offset(t_val)
+    vals = t_val.split(":").map(&:to_i)
+    vals[2] + (vals[1] * 60) + (vals[0] * 60 * 60)
   end
 
   def self.create_or_update_many(props)
