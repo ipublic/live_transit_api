@@ -3,7 +3,7 @@ LiveTransitApi::Application.routes.draw do
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
-  resources :vehicle_positions, :only => :create
+  resources :vehicle_positions, :only => [:create, :show, :index]
   resources :arrivals, :only => [:show]
   resources :trips, :only => [:show]
   resources :routes, :only => [:show, :index]

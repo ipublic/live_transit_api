@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?> 
+%vehicle_position{ :url => url_for(@vehicle_position) }
+  %vehicle_id= @vehicle_position.vehicle_id
+  %heading= @vehicle_position.heading
+  %speed= @vehicle_position.speed
+  %latitude= @vehicle_position.latitude
+  %longitude= @vehicle_position.longitude
+  %last_stop_deviation{ :type => "integer"}= @vehicle_position.last_stop_deviation
+  %predicted_deviation{ :type => "integer"}= @vehicle_position.predicted_deviation
+  %previous_sequence{ :type => "integer"}= @vehicle_position.previous_sequence
+  %incident_date_time{ :type => "datetime"}= @vehicle_position.incident_date_time
+  %last_scheduled_time{ :type => "datetime"}= @vehicle_position.last_scheduled_time
+  %vehicle_position_date_time{ :type => "datetime"}= @vehicle_position.vehicle_position_date_time
+  %trip{ :url => url_for(:controller => :trips, :action => :show, :id => @vehicle_position.trip_id) }
+    %trip_id= @vehicle_position.trip_id

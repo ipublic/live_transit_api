@@ -1,0 +1,18 @@
+{  
+  "vehicle_id" : <%=json vehicle_position.vehicle_id %>,
+  "heading" :  <%=json vehicle_position.heading %>,
+  "speed" : <%=json vehicle_position.speed %>,
+  "latitude" : <%=json vehicle_position.latitude %>,
+  "longitude" : <%=json vehicle_position.longitude %>,
+  "last_stop_deviation" : <%=json vehicle_position.last_stop_deviation %>,
+  "predicted_deviation" : <%=json vehicle_position.predicted_deviation %>,
+  "previous_sequence" : <%=json vehicle_position.previous_sequence %>,
+  "incident_date_time" : <%=json vehicle_position.incident_date_time %>,
+  "last_scheduled_time" : <%=json vehicle_position.last_scheduled_time %>,
+  "vehicle_position_date_time" : <%=json vehicle_position.vehicle_position_date_time %>,
+  "trip" : { 
+    "trip_id" : <%=json vehicle_position.trip_id %>,
+    "url" : <%= json url_for(:controller => :trips, :action => :show, :id => vehicle_position.trip_id) %>
+  },
+  "url" : <%=json url_for(vehicle_position) %>
+}

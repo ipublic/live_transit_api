@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?> 
+%vehicle_positions{ :type => "array" }
+  - @vehicle_positions.each do |vp|
+    %vehicle_position{ :url => url_for(vp) }
+      %vehicle_id= vp.vehicle_id
+      %heading= vp.heading
+      %speed= vp.speed
+      %latitude= vp.latitude
+      %longitude= vp.longitude
+      %last_stop_deviation{ :type => "integer"}= vp.last_stop_deviation
+      %predicted_deviation{ :type => "integer"}= vp.predicted_deviation
+      %previous_sequence{ :type => "integer"}= vp.previous_sequence
+      %incident_date_time{ :type => "datetime"}= vp.incident_date_time
+      %last_scheduled_time{ :type => "datetime"}= vp.last_scheduled_time
+      %vehicle_position_date_time{ :type => "datetime"}= vp.vehicle_position_date_time
+      %trip{ :url => url_for(:controller => :trips, :action => :show, :id => vp.trip_id) }
+        %trip_id= vp.trip_id
