@@ -3,6 +3,7 @@ class ArrivalsController < ApplicationController
   def show
     @arrival = Arrival.find(params[:id])
 
+    if @arrival
     respond_to do |format|
       format.html {
         self.formats = [:json]
@@ -10,6 +11,9 @@ class ArrivalsController < ApplicationController
       }
       format.json
       format.xml
+    end
+    else
+      process_not_found
     end
   end
 end

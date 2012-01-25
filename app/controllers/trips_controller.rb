@@ -3,6 +3,7 @@ class TripsController < ApplicationController
   def show
     @trip = Trip.by_trip_id(:key => params[:id]).first
 
+    if @trip
     respond_to do |format|
       format.html {
         self.formats = [:json]
@@ -10,6 +11,9 @@ class TripsController < ApplicationController
       }
       format.json
       format.xml
+    end
+    else
+      process_not_found
     end
   end
 end

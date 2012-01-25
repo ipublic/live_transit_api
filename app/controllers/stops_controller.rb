@@ -23,6 +23,7 @@ class StopsController < ApplicationController
   def show
     @stop = Stop.find_by_stop_code(params[:id])
 
+    if @stop
     respond_to do |format|
       format.html {
         self.formats = [:json]
@@ -30,6 +31,9 @@ class StopsController < ApplicationController
       }
       format.xml
       format.json
+    end
+    else
+      process_not_found
     end
   end
 

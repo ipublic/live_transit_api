@@ -16,6 +16,7 @@ class RoutesController < ApplicationController
   def show
     @route = Route.find_by_route_id(params[:id])
 
+    if @route
     respond_to do |format|
       format.html {
         self.formats = [:json]
@@ -24,6 +25,9 @@ class RoutesController < ApplicationController
       format.json
       format.xml
       format.geojson { render :json => @route.to_geojson }
+    end
+    else
+      process_not_found
     end
   end
 end
