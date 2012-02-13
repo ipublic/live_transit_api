@@ -24,6 +24,8 @@ class CalculatedArrival
   def self.find_for_stop_and_now(stop_id)
     self.all.select do |ca|
       ca["stop_id"] == stop_id
+    end.sort_by do |ca|
+      ca[:calculated_time]
     end
   end
 

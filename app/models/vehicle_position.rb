@@ -21,14 +21,16 @@ class VehiclePosition < CouchRest::Model::Base
     allowable_stops = trip.stops.reject do |st|
       st["stop_sequence"] < previous_sequence
     end
-    bottom_offset = get_offset(allowable_stops.min { |ast| ast["stop_sequence"] }["arrival_time"])
+    first_stop_in_list = allowable_stops.sort_by { |ast| ast["stop_sequence"] }.first
+    return([]) if first_stop_in_list.nil?
+    bottom_offset = get_offset(first_stop_in_list["arrival_time"])
     schedule_time = parse_mssql_date_time(last_scheduled_time)
     allowable_stops.map do |ast|
-      offset = get_offset(ast["arrival_time"]) - bottom_offset - (predicted_deviation * 60)
+      offset = get_offset(ast["arrival_time"]) - bottom_offset  - (predicted_deviation * 60)
       ast.merge({ 
         "trip_id" => trip.trip_id,
         "last_stop_name" => trip.last_stop_name,
-        "scheduled_time" => schedule_time - offset
+        "scheduled_time" => schedule_time + offset.seconds
       })
     end
   end
@@ -43,13 +45,7 @@ class VehiclePosition < CouchRest::Model::Base
   end
 
   def self.create_or_update_many(props)
-    if props.kind_of?(Array)
-      props.map do |prop|
-        create_or_update(prop)
-      end.last
-    else
       create_or_update(props)
-    end
   end
 
   def self.create_or_update(params)
@@ -57,13 +53,17 @@ class VehiclePosition < CouchRest::Model::Base
     if !params.nil?
       if !params["NewDataSet"].nil?
         if !params["NewDataSet"]["Table"].nil?
-          props = params["NewDataSet"]["Table"]
+          all_records = params["NewDataSet"]["Table"]
+          all_records.each do |props|
           rec_id = props['vehicle_id']
           record = self.by_vehicle_id.key(rec_id).first
           if record.nil?
             record = self.create!(props)
           else
+            puts "BLAH"
             record.update_attributes(props)
+            record.save
+          end
           end
         end
       end

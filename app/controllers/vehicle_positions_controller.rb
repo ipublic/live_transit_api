@@ -9,7 +9,7 @@ class VehiclePositionsController < ApplicationController
   end
 
   def index
-    @vehicle_positions = VehiclePosition.all.docs
+    @vehicle_positions = VehiclePosition.all(:include_docs => true).docs
 
     respond_to do |format|
       format.html {

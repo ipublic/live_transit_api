@@ -1,7 +1,7 @@
 class RoutesController < ApplicationController
   before_filter :authenticate_user!
   def index
-    @routes = Route.all.docs
+    @routes = Route.all(:include_docs => true).docs
 
     respond_to do |format|
       format.html {
@@ -14,7 +14,7 @@ class RoutesController < ApplicationController
   end
 
   def show
-    @route = Route.find_by_route_id(params[:id])
+    @route = Route.find_by_route_id(params[:id]) 
 
     if @route
     respond_to do |format|
