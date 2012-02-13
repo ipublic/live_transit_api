@@ -71,8 +71,11 @@ class VehiclePosition < CouchRest::Model::Base
           end
           self.database.bulk_save(existing_vehicles)
           new_vehicle_ids = vehicle_data_hash.keys.reject { |k| existing_vehicle_ids.include?(k) }
-          new_vehicle_ids.each do |nvid|
-            self.create!(vehicle_data_hash[nvid])
+          if new_vehicle_ids.length > 0
+            new_vps = new_vehicle_ids.map do |nvid|
+              VehiclePosition.new(vehicle_data_hash[nvid])
+            end
+            self.database.bulk_save(new_vps)
           end
         end
       end
