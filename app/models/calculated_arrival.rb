@@ -2,9 +2,9 @@ class CalculatedArrival
   attr_reader :attributes
 
   def self.all
-    vehicles = VehiclePosition.all
+    vehicles = VehiclePosition.all(:include_docs => true)
     trip_ids = vehicles.map(&:trip_id)
-    found_trips = Trip.by_trip_id(:keys => trip_ids).all
+    found_trips = Trip.by_trip_id(:keys => trip_ids, :include_docs => true).all
     found_stops = StopTime.multiple_trip_stops(:keys => trip_ids, :view => :for_trip_id).all
     found_trips.each do |ft|
       ft.stops = found_stops[ft.trip_id]

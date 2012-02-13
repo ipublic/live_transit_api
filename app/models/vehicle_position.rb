@@ -18,8 +18,13 @@ class VehiclePosition < CouchRest::Model::Base
 
   def calculate_adjusted_stops(trip)
     return([]) if self.predicted_deviation == 63
-    allowable_stops = trip.stops.reject do |st|
-      st["stop_sequence"] < previous_sequence
+    allowable_stops = []
+    if self.previous_sequence.nil?
+      allowable_stops = trip.stops
+    else
+      allowable_stops = trip.stops.reject do |st|
+        st["stop_sequence"] < previous_sequence
+      end
     end
     first_stop_in_list = allowable_stops.sort_by { |ast| ast["stop_sequence"] }.first
     return([]) if first_stop_in_list.nil?
@@ -45,7 +50,7 @@ class VehiclePosition < CouchRest::Model::Base
   end
 
   def self.create_or_update_many(props)
-      create_or_update(props)
+    create_or_update(props)
   end
 
   def self.create_or_update(params)
@@ -54,24 +59,30 @@ class VehiclePosition < CouchRest::Model::Base
       if !params["NewDataSet"].nil?
         if !params["NewDataSet"]["Table"].nil?
           all_records = params["NewDataSet"]["Table"]
-          all_records.each do |props|
-          rec_id = props['vehicle_id']
-          record = self.by_vehicle_id.key(rec_id).first
-          if record.nil?
-            record = self.create!(props)
-          else
-            record.update_attributes(props)
-            record.save
+          vehicle_data_hash = all_records.inject({}) do |memo, v|
+            memo[v['vehicle_id']] = v
+            memo
           end
+          existing_vehicles = VehiclePosition.by_vehicle_id(:keys => vehicle_data_hash.keys, :include_docs => true).docs
+
+          existing_vehicle_ids = existing_vehicles.map(&:vehicle_id)
+          existing_vehicles.each do |ev|
+            ev.update_attributes(vehicle_data_hash[ev.vehicle_id])
+          end
+          self.database.save_docs(existing_vehicles)
+          new_vehicle_ids = vehicle_data_hash.keys.reject { |k| existing_vehicle_ids.contains?(k) }
+          new_vehicle_ids.each do |nvid|
+            self.create!(vehicle_data_hash[nvid])
           end
         end
       end
     end
-    record
   end
+  record
+end
 
-  def to_param
-    vehicle_id
-  end
+def to_param
+  vehicle_id
+end
 
 end

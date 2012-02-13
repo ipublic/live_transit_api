@@ -8,11 +8,11 @@ class ScheduledArrival
     yesterdays = StopTime.by_stop_and_date(:bbox => StopTime.date_before_day_bbox(st_id, date_str)).all
     tomorrows = StopTime.by_stop_and_date(:bbox => StopTime.date_after_day_bbox(st_id, date_str)).all
     trip_ids = (todays.map(&:trip_id) + tomorrows.map(&:trip_id) + yesterdays.map(&:trip_id)).uniq
-    trips = Trip.by_trip_id(:keys => trip_ids).inject({}) do |h, t|
+    trips = Trip.by_trip_id(:keys => trip_ids, :include_docs => true).inject({}) do |h, t|
       h[t.trip_id] = t
       h
     end
-    route_names = Route.by_route_id(:keys => trips.values.map(&:route_id)).inject({}) do |h, r|
+    route_names = Route.by_route_id(:keys => trips.values.map(&:route_id), :include_docs => true).inject({}) do |h, r|
       h[r.route_id] = r.route_long_name
       h
     end
