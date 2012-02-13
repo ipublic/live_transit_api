@@ -60,7 +60,6 @@ class VehiclePosition < CouchRest::Model::Base
           if record.nil?
             record = self.create!(props)
           else
-            puts "BLAH"
             record.update_attributes(props)
             record.save
           end
