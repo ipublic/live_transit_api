@@ -78,11 +78,9 @@ class VehiclePosition < CouchRest::Model::Base
       end
     end
   end
-  record
-end
 
-def to_param
-  vehicle_id
-end
+  def to_param
+    vehicle_id
+  end
 
 end

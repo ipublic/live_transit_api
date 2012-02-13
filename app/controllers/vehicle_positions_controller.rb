@@ -1,7 +1,7 @@
 class VehiclePositionsController < ApplicationController
   before_filter :authenticate_user!, :except => :create
   def create
-    @vehicle_position = VehiclePosition.create_or_update(params)
+    VehiclePosition.create_or_update(params)
 
     respond_to do |format|
       format.xml { render :nothing => true, :status => 202 }
