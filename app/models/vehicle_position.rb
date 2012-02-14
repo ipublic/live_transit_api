@@ -35,13 +35,14 @@ class VehiclePosition < CouchRest::Model::Base
       ast.merge({ 
         "trip_id" => trip.trip_id,
         "last_stop_name" => trip.last_stop_name,
-        "scheduled_time" => schedule_time + offset.seconds
+        "scheduled_time" => schedule_time + offset.seconds,
+        "vehicle_id" => self.vehicle_id 
       })
     end
   end
 
   def parse_mssql_date_time(dt_val)
-    DateTime.strptime(dt_val, "%FT%T%:z")
+    Time.strptime(dt_val, "%FT%T%:z")
   end
 
   def get_offset(t_val)

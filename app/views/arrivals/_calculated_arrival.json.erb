@@ -8,9 +8,13 @@
     "trip_id" : <%=json calculated_arrival[:trip_id] %>,
     "trip_headsign" : <%= json calculated_arrival[:trip_headsign] %>,
     "url" : <%= json url_for(:controller => :trips, :action => :show, :id => calculated_arrival[:trip_id]) %>
-   },
-   "destination_stop_name" : <%=json calculated_arrival[:destination_stop_name] %>,
-   "calculated_time" : <%=json calculated_arrival[:calculated_time] %>,
-   "calculated_display_time" : <%=json calculated_arrival[:calculated_display_time] %>,
-   "message" : <%=json calculated_arrival[:message] %>
+  },
+  "vehicle_position" : {
+    "vehicle_id" : <%=json calculated_arrival[:vehicle_id] %>,
+    "url" : <%=json url_for(:controller => :vehicle_positions, :action => :show, :id => calculated_arrival[:vehicle_id]) %>
+  },
+  "destination_stop_name" : <%=json calculated_arrival[:destination_stop_name] %>,
+  "calculated_time" : <%=json calculated_arrival[:calculated_time] %>,
+  "calculated_display_time" : <%=json calculated_arrival[:calculated_display_time] %>,
+  "message" : <%=json calculated_arrival[:message] %>
 }
