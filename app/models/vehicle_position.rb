@@ -14,6 +14,7 @@ class VehiclePosition < CouchRest::Model::Base
 
   design do
     view :by_vehicle_id
+    view :by_trip_id
   end
 
   def calculate_adjusted_stops(trip)

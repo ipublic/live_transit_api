@@ -1,8 +1,9 @@
 class CalculatedArrival
   attr_reader :attributes
 
-  def self.all
-    vehicles = VehiclePosition.all(:include_docs => true)
+  def self.find_for_stop_and_now(stop_id)
+    stop_trip_ids = StopTime.trips_for_stop(:key => "6328", :view => :for_stop_id)
+    vehicles = VehiclePosition.by_trip_id(:keys => stop_trip_ids, :include_docs => true).docs
     trip_ids = vehicles.map(&:trip_id)
     found_trips = Trip.by_trip_id(:keys => trip_ids, :include_docs => true).docs
     found_stops = StopTime.multiple_trip_stops(:keys => trip_ids, :view => :for_trip_id).all
@@ -18,23 +19,11 @@ class CalculatedArrival
       v.calculate_adjusted_stops(vehicle_trips[v.trip_id])
     end.flatten
     # 2.3 seconds to here
-#    RubyProf.start
     result = vehicle_stuff.map do |ast|
       CalculatedArrival.new(vehicle_trips[ast["trip_id"]], route_names, ast)
     end # 1.4 seconds, down from 4
-#    prof_result = RubyProf.stop
-#    printer = RubyProf::GraphHtmlPrinter.new(prof_result)
-#    pf = File.open("profile.html", "w")
-#    printer.print(pf)
-#    pf.close
-    result
-  end
-
-  def self.find_for_stop_and_now(stop_id)
-    self.all.select do |ca|
+    result.select do |ca|
       ca["stop_id"] == stop_id
-    end.sort_by do |ca|
-      ca[:calculated_time]
     end
   end
 

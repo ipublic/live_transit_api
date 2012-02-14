@@ -2,16 +2,18 @@ class ScheduledArrival
   attr_reader :attributes
 
   def self.find_for_stop_and_now(st_id)
-    date_str = Date.today.strftime("%Y-%m-%d")
+    #RubyProf.start
+    date_str = Time.now.strftime("%Y-%m-%d")
     time_str = Time.now.strftime("%H:%M:%s")
-    todays = StopTime.by_stop_and_date(:bbox => StopTime.date_of_day_bbox(st_id, date_str)).all
-    yesterdays = StopTime.by_stop_and_date(:bbox => StopTime.date_before_day_bbox(st_id, date_str)).all
-    tomorrows = StopTime.by_stop_and_date(:bbox => StopTime.date_after_day_bbox(st_id, date_str)).all
+    todays = StopTime.by_stop_and_date(:bbox => StopTime.date_of_day_bbox(st_id, date_str)).docs
+    yesterdays = StopTime.by_stop_and_date(:bbox => StopTime.date_before_day_bbox(st_id, date_str)).docs
+    tomorrows = StopTime.by_stop_and_date(:bbox => StopTime.date_after_day_bbox(st_id, date_str)).docs
     trip_ids = (todays.map(&:trip_id) + tomorrows.map(&:trip_id) + yesterdays.map(&:trip_id)).uniq
-    trips = Trip.by_trip_id(:keys => trip_ids, :include_docs => true).inject({}) do |h, t|
+    # Takes about 1 second to get here from start of method
+    trips = Trip.by_trip_id(:keys => trip_ids, :include_docs => true).docs.inject({}) do |h, t|
       h[t.trip_id] = t
       h
-    end
+    end # This line takes 0.5 seconds!
     route_names = Route.by_route_id(:keys => trips.values.map(&:route_id), :include_docs => true).inject({}) do |h, r|
       h[r.route_id] = r.route_long_name
       h
@@ -21,6 +23,12 @@ class ScheduledArrival
         yesterdays.map { |st| ScheduledArrival.new(st, trips[st.trip_id], route_names, -24) } +
         tomorrows.map { |st| ScheduledArrival.new(st, trips[st.trip_id], route_names, 24) }
     ).reject { |sa| sa.attributes[:departure_time] < time_str }.sort_by { |sa| sa.attributes[:arrival_time] }
+# prof_result = RubyProf.stop
+# printer = RubyProf::GraphHtmlPrinter.new(prof_result)
+# pf = File.open("profile.html", "w")
+# printer.print(pf)
+# pf.close
+# result
   end
 
   def initialize(st, trip, route_names, offset=0)
