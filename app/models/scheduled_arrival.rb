@@ -5,9 +5,12 @@ class ScheduledArrival
     #RubyProf.start
     date_str = Time.now.strftime("%Y-%m-%d")
     time_str = Time.now.strftime("%H:%M:%s")
-    todays = StopTime.by_stop_and_date(:bbox => StopTime.date_of_day_bbox(st_id, date_str)).docs
-    yesterdays = StopTime.by_stop_and_date(:bbox => StopTime.date_before_day_bbox(st_id, date_str)).docs
-    tomorrows = StopTime.by_stop_and_date(:bbox => StopTime.date_after_day_bbox(st_id, date_str)).docs
+    date_of_bbox = StopTime.date_of_day_bbox(st_id, date_str)
+    date_before_bbox = StopTime.date_before_day_bbox(st_id, date_str)
+    date_after_bbox = StopTime.date_after_day_bbox(st_id, date_str)
+    todays = Rails.cache.fetch("stop_times_#{date_of_bbox.to_s}") { StopTime.by_stop_and_date(:bbox => date_of_bbox).docs }.dup
+    yesterdays = Rails.cache.fetch("stop_times_#{date_before_bbox.to_s}") { StopTime.by_stop_and_date(:bbox => date_before_bbox).docs }.dup
+    tomorrows = Rails.cache.fetch("stop_times_#{date_after_bbox.to_s}") { StopTime.by_stop_and_date(:bbox => date_after_bbox).docs }.dup
     trip_ids = (todays.map(&:trip_id) + tomorrows.map(&:trip_id) + yesterdays.map(&:trip_id)).uniq
     # Takes about 1 second to get here from start of method
     trips = Trip.by_trip_id(:keys => trip_ids, :include_docs => true).docs.inject({}) do |h, t|
