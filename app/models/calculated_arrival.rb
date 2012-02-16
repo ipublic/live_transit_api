@@ -2,7 +2,7 @@ class CalculatedArrival
   attr_reader :attributes
 
   def self.find_for_stop_and_now(stop_id)
-    stop_trip_ids = StopTime.trips_for_stop(:key => "6328", :view => :for_stop_id)
+    stop_trip_ids = Rails.cache.fetch("trips_for_stop_#{stop_id}") { StopTime.trips_for_stop(:key => stop_id, :view => :for_stop_id) }
     vehicles = VehiclePosition.by_trip_id(:keys => stop_trip_ids, :include_docs => true).docs
     trip_ids = vehicles.map(&:trip_id)
     found_trips = Trip.by_trip_id(:keys => trip_ids, :include_docs => true).docs

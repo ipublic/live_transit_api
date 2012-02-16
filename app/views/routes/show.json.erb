@@ -1,3 +1,4 @@
+<% cache("route_show_json_#{@route.route_id}") do %>
 {
 <%= render :partial => "routes/route", :object => @route %>,
 "trips" : [
@@ -7,3 +8,4 @@
  <%= raw @route.shapes.map(&:to_json).join(",") %>
 ]
 }
+<% end %>

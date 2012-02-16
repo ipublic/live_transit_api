@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 %route
-  = render :partial => "routes/route", :object => @route
-  %trips{ :type => "array" }
-    = render :partial => "trips/trip_item", :collection => @route.trips
-  %shapes{ :type => "array" }
-    - @route.shapes.each do |shape|
-      != shape.to_xml({:root => "shape", :skip_instruct => true})
+  - cache("route_show_xml_#{@route.route_id}") do
+    = render :partial => "routes/route", :object => @route
+    %trips{ :type => "array" }
+      = render :partial => "trips/trip_item", :collection => @route.trips
+    %shapes{ :type => "array" }
+      - @route.shapes.each do |shape|
+        != shape.to_xml({:root => "shape", :skip_instruct => true})
