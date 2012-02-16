@@ -1,3 +1,5 @@
+<% cache("stops_index_json") do %>
 [
 <%= render :partial => "stops/stop_item", :collection => @stops, :spacer_template => "shared/json_spacer" %>
 ]
+<% end %>

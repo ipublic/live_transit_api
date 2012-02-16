@@ -1,3 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?> 
 %routes{ :type => "array" }
-  = render :partial => "route_item", :collection => @routes
+  - cache("routes_index_xml") do
+    = render :partial => "route_item", :collection => @routes

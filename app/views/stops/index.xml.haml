@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 %stops{ :type => "array" }
-  - @stops.each do |stop_item|
-    %stop{ :uri => url_for(stop_item) }
-      %stop_id= stop_item.stop_id
-      %stop_code= stop_item.stop_name
-      %stop_name= stop_item.stop_name
-      %stop_lat= stop_item.stop_lat
-      %stop_lon= stop_item.stop_lon
-      %zone_id= stop_item.zone_id
-      %stop_url= stop_item.stop_url
-      %location_type= stop_item.location_type
-      %stop_name= stop_item.stop_name
-      %parent_station= stop_item.parent_station
-      != stop_item.geometry.to_xml(:skip_instruct => true, :root => :geometry)
+  - cache("stops_index_xml") do
+    - @stops.each do |stop_item|
+      %stop{ :uri => url_for(stop_item) }
+        %stop_id= stop_item.stop_id
+        %stop_code= stop_item.stop_name
+        %stop_name= stop_item.stop_name
+        %stop_lat= stop_item.stop_lat
+        %stop_lon= stop_item.stop_lon
+        %zone_id= stop_item.zone_id
+        %stop_url= stop_item.stop_url
+        %location_type= stop_item.location_type
+        %stop_name= stop_item.stop_name
+        %parent_station= stop_item.parent_station
+        != stop_item.geometry.to_xml(:skip_instruct => true, :root => :geometry)

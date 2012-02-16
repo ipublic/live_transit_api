@@ -29,6 +29,8 @@
         %trip{ :url => url_for(:controller => :trips, :action => :show, :id => ca[:trip_id]) }
           %trip_id= ca[:trip_id]
           %trip_headsign= ca[:trip_headsign]
+        %vehicle_position{ :url => url_for(:controller => :vehicle_positions, :action => :show, :id => ca[:vehicle_id]) }
+          %vehicle_id= ca[:vehicle_id]
         %destination_stop_name= ca[:destination_stop_name]
         %calculated_time{:type => "datetime"}= ca[:calculated_time]
         %calculated_display_time= ca[:calculated_display_time]
