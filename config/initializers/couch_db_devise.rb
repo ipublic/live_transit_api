@@ -40,10 +40,7 @@ module CouchRest
           if conditions.keys.first == :id
             klass.get(conditions.values.first)
           else
-              # Performance hack
-              Rails.cache.fetch("devise_by_#{conditions.keys.first.to_s}_#{conditions.values.first.to_s}") {
-                klass.send("by_#{conditions.keys.first}", {:key => conditions.values.first, :limit => 1, :include_docs => true}).first
-              }
+            klass.send("by_#{conditions.keys.first}", {:key => conditions.values.first, :limit => 1, :include_docs => true}).first
           end
         end
 

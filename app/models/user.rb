@@ -10,7 +10,6 @@ class User < CouchRest::Model::Base
   end
 
   before_create :generate_auth_token
-  after_save :clear_auth_token_cache
 
   def generate_auth_token
     auth_token = SecureRandom.base64(40).tr('+/=lIO0', 'pqrsxyz')
@@ -21,9 +20,4 @@ class User < CouchRest::Model::Base
     self.authentication_token = auth_token
   end
 
-  def clear_auth_token_cache
-    Rails.cache.delete("devise_by_authentication_token_#{self.authentication_token.to_s}")
-    Rails.cache.delete("devise_by_email_#{self.email.to_s}")
-    Rails.cache.delete("devise_by_confirmation_token_#{self.confirmation_token.to_s}")
-  end
 end
