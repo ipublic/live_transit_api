@@ -12,6 +12,7 @@ default_run_options[:shell] = false
 role :web, "172.30.12.210"
 role :app, "172.30.12.210"
 role :db, "172.30.12.210", :primary => true
+after "deploy", "deploy:cleanup"
 
 namespace :deploy do
   task :start do ; end
