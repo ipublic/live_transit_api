@@ -1,7 +1,7 @@
 class User < CouchRest::Model::Base
   self.database = CouchDatabases[:authentication]
 
-  devise :database_authenticatable, :registerable, :recoverable, :rememberable, :trackable, :validatable, :token_authenticatable, :timeoutable
+  devise :database_authenticatable, :registerable, :recoverable, :validatable, :token_authenticatable 
 
   design do
     view :by_email
