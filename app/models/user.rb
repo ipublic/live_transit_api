@@ -23,5 +23,7 @@ class User < CouchRest::Model::Base
 
   def clear_auth_token_cache
     Rails.cache.delete("devise_by_authentication_token_#{self.authentication_token.to_s}")
+    Rails.cache.delete("devise_by_email_#{self.email.to_s}")
+    Rails.cache.delete("devise_by_confirmation_token_#{self.confirmation_token.to_s}")
   end
 end
