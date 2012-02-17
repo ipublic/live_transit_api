@@ -2,7 +2,7 @@ class ScheduledArrival
   attr_reader :attributes
 
   def self.find_for_stop_and_now(st_id)
-    #RubyProf.start
+#RubyProf.start
     date_str = Time.now.strftime("%Y-%m-%d")
     time_str = Time.now.strftime("%H:%M:%s")
     date_of_bbox = StopTime.date_of_day_bbox(st_id, date_str)
@@ -12,7 +12,6 @@ class ScheduledArrival
     yesterdays = Rails.cache.fetch("stop_times_#{date_before_bbox.to_s}") { StopTime.by_stop_and_date(:bbox => date_before_bbox).docs }.dup
     tomorrows = Rails.cache.fetch("stop_times_#{date_after_bbox.to_s}") { StopTime.by_stop_and_date(:bbox => date_after_bbox).docs }.dup
     trip_ids = (todays.map(&:trip_id) + tomorrows.map(&:trip_id) + yesterdays.map(&:trip_id)).uniq
-    # Takes about 1 second to get here from start of method
     trips = Trip.by_trip_id(:keys => trip_ids, :include_docs => true).docs.inject({}) do |h, t|
       h[t.trip_id] = t
       h
@@ -21,17 +20,16 @@ class ScheduledArrival
       h[r.route_id] = r.route_long_name
       h
     end
+#prof_result = RubyProf.stop
+#printer = RubyProf::GraphHtmlPrinter.new(prof_result)
+#pf = File.open("profile.html", "w")
+#printer.print(pf)
+#pf.close
     (
       todays.map { |st| ScheduledArrival.new(st, trips[st.trip_id], route_names) } +
         yesterdays.map { |st| ScheduledArrival.new(st, trips[st.trip_id], route_names, -24) } +
         tomorrows.map { |st| ScheduledArrival.new(st, trips[st.trip_id], route_names, 24) }
     ).reject { |sa| sa.attributes[:departure_time] < time_str }.sort_by { |sa| sa.attributes[:arrival_time] }
-# prof_result = RubyProf.stop
-# printer = RubyProf::GraphHtmlPrinter.new(prof_result)
-# pf = File.open("profile.html", "w")
-# printer.print(pf)
-# pf.close
-# result
   end
 
   def initialize(st, trip, route_names, offset=0)

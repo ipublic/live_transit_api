@@ -13,15 +13,14 @@ class CalculatedArrival
     route_names = Route.by_route_id(:keys => found_trips.map(&:route_id)).inject({}) do |h, r|
       h[r.route_id] = r.route_long_name
       h
-    end # 2 seconds so far
-    vehicle_trips = found_trips.inject({}) { |memo, val| memo[val.trip_id] = val; memo } # 0.1 second
+    end
+    vehicle_trips = found_trips.inject({}) { |memo, val| memo[val.trip_id] = val; memo }
     vehicle_stuff = vehicles.map do |v|
       v.calculate_adjusted_stops(vehicle_trips[v.trip_id])
     end.flatten
-    # 2.3 seconds to here
     result = vehicle_stuff.map do |ast|
       CalculatedArrival.new(vehicle_trips[ast["trip_id"]], route_names, ast)
-    end # 1.4 seconds, down from 4
+    end
     result.select do |ca|
       ca["stop_id"] == stop_id
     end
