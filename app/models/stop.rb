@@ -13,11 +13,12 @@ class Stop < CouchRest::Model::Base
   design do
     view :by_stop_code
   end
-  
-  include XmlSerializableDocument
 
   def self.find_by_stop_code(sc)
-    self.by_stop_code.key(sc).first
+    Rails.cache.fetch("stop_by_code_#{sc}") {
+      Rails.logger.info "fetching stop_by_code_#{sc}"
+      self.by_stop_code.key(sc).docs.first
+    }
   end
 
   def stop_times

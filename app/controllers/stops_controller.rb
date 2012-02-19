@@ -1,7 +1,9 @@
 class StopsController < ApplicationController
   before_filter :authenticate_user!
   def index
-    @stops = Rails.cache.fetch("all_stops") { Stop.all(:include_docs => true).docs }
+    @stops = Rails.cache.fetch("all_stops") { 
+      Rails.logger.info "Looking up all stops"
+      Stop.all(:include_docs => true).docs }
 
     respond_to do |format|
       format.html {

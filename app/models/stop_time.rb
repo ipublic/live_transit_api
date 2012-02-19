@@ -36,7 +36,7 @@ class StopTime < CouchRest::Model::Base
   end
 
   def self.date_of_day_bbox(st_id, date_str)
-    w_day = Date.strptime(date_str, "%Y-%m-%d").wday
+    w_day = Time.strptime(date_str, "%Y-%m-%d").wday
     day_val = date_str.gsub("-", "")
     date_key = "#{w_day}.#{day_val}"
     start_t = "0"
@@ -47,9 +47,9 @@ class StopTime < CouchRest::Model::Base
   end
 
   def self.date_after_day_bbox(st_id, date_str)
-    todays_date = Date.strptime(date_str, "%Y-%m-%d")
-    w_day = (todays_date + 1).wday
-    day_val = (todays_date + 1).strftime("%Y%m%d")
+    todays_date = Time.strptime(date_str, "%Y-%m-%d")
+    w_day = (todays_date + 1.day).wday
+    day_val = (todays_date + 1.day).strftime("%Y%m%d")
     day_val = date_str.gsub("-", "")
     date_key = "#{w_day}.#{day_val}"
     start_t = "0"
@@ -60,9 +60,9 @@ class StopTime < CouchRest::Model::Base
   end
 
   def self.date_before_day_bbox(st_id, date_str)
-    todays_date = Date.strptime(date_str, "%Y-%m-%d")
-    w_day = (todays_date - 1).wday
-    day_val = (todays_date - 1).strftime("%Y%m%d")
+    todays_date = Time.strptime(date_str, "%Y-%m-%d")
+    w_day = (todays_date - 1.day).wday
+    day_val = (todays_date - 1.day).strftime("%Y%m%d")
     day_val = date_str.gsub("-", "")
     date_key = "#{w_day}.#{day_val}"
     start_t = "240000"
@@ -71,47 +71,6 @@ class StopTime < CouchRest::Model::Base
     end_x = "#{st_id}.#{end_t}"
     [start_x, date_key, end_x, date_key]
   end
-
-  def self.calculate_day_bbox(st_id, date_str)
-    date_parts = date_str.split("\s")
-    w_day = Date.strptime(date_parts.first, "%Y-%m-%d").wday
-    day_val = date_parts[0].gsub("-", "")
-    date_key = "#{w_day}.#{day_val}"
-    start_t = "0"
-    end_t = "235959"
-    if !date_parts[1].nil?
-      time_parts = date_parts[1].split("-")
-      start_t = time_parts[0].gsub(":", "")
-      if !time_parts[1].nil?
-        end_t = time_parts[1].gsub(":", "")
-      end
-    end
-    start_x = "#{st_id}.#{start_t}"
-    end_x = "#{st_id}.#{end_t}"
-    [start_x, date_key, end_x, date_key]
-  end
-
-  def self.calculate_previous_day_bbox(st_id, date_str)
-    date_parts = date_str.split("\s")
-    todays_date = Date.strptime(date_parts.first, "%Y-%m-%d")
-    w_day = (todays_date - 1).wday
-    day_val = (todays_date - 1).strftime("%Y%m%d")
-    date_key = "#{w_day}.#{day_val}"
-    start_t = "240000"
-    end_t = "475959"
-    if !date_parts[1].nil?
-      time_parts = date_parts[1].split("-")
-      first_time_parts = time_parts.first.split(":")
-      start_t = ([(first_time_parts.first.to_i + 24).to_s] + first_time_parts[1..-1]).join
-      if !time_parts[1].nil?
-        end_time_parts = time_parts.last.split(":")
-        end_t = ([(end_time_parts.first.to_i + 24).to_s] + end_time_parts[1..-1]).join
-      end
-    end
-    start_x = "#{st_id}.#{start_t}"
-    end_x = "#{st_id}.#{end_t}"
-    [start_x, date_key, end_x, date_key]
- end
 
   def to_xml(options = {}, &block)
     ActiveModel::Serializers::Xml::Serializer.new(self, options.merge(:methods => [:last_stop_name, :geometry])).serialize(&block)

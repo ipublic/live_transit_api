@@ -1,4 +1,6 @@
 class VehiclePosition < CouchRest::Model::Base
+  self.database = CouchDatabases[:vehicles]
+
   property :vehicle_id, String
   property :latitude, String
   property :longitude, String

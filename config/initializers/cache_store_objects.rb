@@ -1,35 +1,41 @@
+=begin
 module Dalli
-  class Client
-    def replace(key, value, ttl=nil, options=nil)
-      ttl ||= @options[:expires_in]
-      perform(:replace, key, Marshal.dump(value), ttl, options)
-    end
-
-    def add(key, value, ttl=nil, options=nil)
-      ttl ||= @options[:expires_in]
-      perform(:add, key, Marshal.dump(value), ttl, options)
-    end
-
-    def cas(key, ttl=nil, options=nil, &block)
-      ttl ||= @options[:expires_in]
-      (value, cas) = perform(:cas, key)
-      value = (!value || value == 'Not found') ? nil : value
-      if value
-        newvalue = block.call(value)
-        perform(:set, key, Marshal.dump(newvalue), ttl, cas, options)
+  class Server
+    def serialize(key, value, options=nil)
+      marshalled = true
+      value = unless options && options[:raw]
+                begin
+                  Marshal.dump(value)
+                rescue => ex
+                  # Marshalling can throw several different types of generic Ruby exceptions.
+                  #           # Convert to a specific exception so we can special case it higher up the stack.
+                  exc = Dalli::MarshalError.new(ex.message)
+                  exc.set_backtrace ex.backtrace
+                  raise exc
+                end
+              else
+                marshaled = false
+                value.to_s
+              end
+      compressed = false
+      if @options[:compression] && value.bytesize >= COMPRESSION_MIN_SIZE
+        value = Zlib::Deflate.deflate(value)
+        compressed = true
       end
+      flags = 0
+      flags |= FLAG_COMPRESSED if compressed
+      flags |= FLAG_MARSHALLED if marshalled
+      [value, flags]
     end
-
-    def set(key, value, ttl=nil, options=nil)
-      raise "Invalid API usage, please require 'dalli/memcache-client' for compatibility, see Upgrade.md" if options == true
-      ttl ||= @options[:expires_in]
-      perform(:set, key, Marshal.dump(value), ttl, 0, options)
-    end
-
-
-    def get(key, options=nil)
-      resp = perform(:get, key)
-      (!resp || resp == 'Not found') ? nil : resp
+    def deserialize(value, flags)
+      value = Zlib::Inflate.inflate(value) if (flags & FLAG_COMPRESSED) != 0
+      value = Marshal.load(value) if (flags & FLAG_MARSHALLED) != 0
+      value
+    rescue TypeError, ArgumentError
+      raise DalliError, "Unable to unmarshal value: #{$!.message}"
+    rescue Zlib::Error
+      raise DalliError, "Unable to uncompress value: #{$!.message}"
     end
   end
 end
+=end

@@ -7,9 +7,7 @@ LiveTransitApi::Application.routes.draw do
   resources :arrivals, :only => [:show]
   resources :trips, :only => [:show]
   resources :routes, :only => [:show, :index]
-  resources :stops, :only => [:show, :index] do
-    resources :schedules, :module => "Stops"
-  end
+  resources :stops, :only => [:show, :index]
 
   # Sample of regular route:
   #   match 'products/:id' => 'catalog#view'

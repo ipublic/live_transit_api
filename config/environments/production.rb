@@ -20,7 +20,6 @@ LiveTransitApi::Application.configure do
   # Generate digests for assets URLs
   config.assets.digest = true
 
-  config.cache_store = :dalli_store
   # Defaults to Rails.root.join("public/assets")
   # config.assets.manifest = YOUR_PATH
 
@@ -58,4 +57,5 @@ LiveTransitApi::Application.configure do
 
   # Send deprecation notices to registered listeners
   config.active_support.deprecation = :notify
+  config.cache_store = :dalli_store, 'localhost', { :namespace => "live_transit_api", :compression => true}
 end
