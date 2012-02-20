@@ -71,7 +71,7 @@ class VehiclePosition < CouchRest::Model::Base
 
           existing_vehicle_ids = existing_vehicles.map(&:vehicle_id)
           existing_vehicles.each do |ev|
-            ev.update_attributes(vehicle_data_hash[ev.vehicle_id])
+            ev.attributes = ev.attributes.merge(vehicle_data_hash[ev.vehicle_id])
           end
           self.database.bulk_save(existing_vehicles)
           new_vehicle_ids = vehicle_data_hash.keys.reject { |k| existing_vehicle_ids.include?(k) }
