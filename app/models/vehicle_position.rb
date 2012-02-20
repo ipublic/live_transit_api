@@ -39,7 +39,7 @@ class VehiclePosition < CouchRest::Model::Base
         "trip_id" => trip.trip_id,
         "last_stop_name" => trip.last_stop_name,
         "scheduled_time" => schedule_time + offset.seconds,
-        "vehicle_id" => self.vehicle_id 
+        "vehicle_id" => self.vehicle_id
       })
     end
   end
@@ -71,9 +71,8 @@ class VehiclePosition < CouchRest::Model::Base
 
           existing_vehicle_ids = existing_vehicles.map(&:vehicle_id)
           existing_vehicles.each do |ev|
-            ev.attributes = ev.attributes.merge(vehicle_data_hash[ev.vehicle_id])
+            ev.update_attributes(vehicle_data_hash[ev.vehicle_id])
           end
-          self.database.bulk_save(existing_vehicles)
           new_vehicle_ids = vehicle_data_hash.keys.reject { |k| existing_vehicle_ids.include?(k) }
           new_vehicle_ids.each do |nvid|
             VehiclePosition.create!(vehicle_data_hash[nvid])
