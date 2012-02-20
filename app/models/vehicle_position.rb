@@ -19,7 +19,7 @@ class VehiclePosition < CouchRest::Model::Base
     view :by_trip_id
   end
 
-  before_save :set_id
+  before_save :setup_id
 
   def setup_id
     self['_id'] = "vehicle_" + self['vehicle_id']
