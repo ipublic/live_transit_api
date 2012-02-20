@@ -19,6 +19,12 @@ class VehiclePosition < CouchRest::Model::Base
     view :by_trip_id
   end
 
+  before_save :set_id
+
+  def setup_id
+    self['_id'] = self['vehicle_id']
+  end
+
   def calculate_adjusted_stops(trip)
     return([]) if self.predicted_deviation == 63
     allowable_stops = []
