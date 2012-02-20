@@ -68,7 +68,7 @@ class VehiclePosition < CouchRest::Model::Base
             memo
           end
           vehicle_data_hash.each_pair do |k,v|
-            evp = VehiclePostion.by_vehicle_id(:key => k, :include_docs => true).first
+            evp = VehiclePosition.by_vehicle_id(:key => k, :include_docs => true).first
             if evp.nil?
               VehiclePosition.create!(vehicle_data_hash[nvid])
             else

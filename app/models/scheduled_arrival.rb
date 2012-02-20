@@ -2,7 +2,6 @@ class ScheduledArrival
   attr_reader :attributes
 
   def self.find_for_stop_and_now(st_id)
-# RubyProf.start
     date_str = Time.now.strftime("%Y-%m-%d")
     time_str = Time.now.strftime("%H:%M:%s")
     date_of_bbox = StopTime.date_of_day_bbox(st_id, date_str)
@@ -33,19 +32,11 @@ class ScheduledArrival
       h
     end
     }
-    result = ((
+    ((
       todays.map { |st| ScheduledArrival.new(st, trips[st.trip_id], route_names) } +
         yesterdays.map { |st| ScheduledArrival.new(st, trips[st.trip_id], route_names, -24) } +
         tomorrows.map { |st| ScheduledArrival.new(st, trips[st.trip_id], route_names, 24) }
     ).reject { |sa| sa.attributes[:departure_time] < time_str }.sort_by { |sa| sa.attributes[:arrival_time] })
-=begin
-prof_result = RubyProf.stop
-printer = RubyProf::GraphHtmlPrinter.new(prof_result)
-pf = File.open("profile.html", "w")
-printer.print(pf)
-pf.close
-result
-=end
   end
 
   def initialize(st, trip, route_names, offset=0)
