@@ -2,11 +2,21 @@ class CalculatedArrival
   attr_reader :attributes
 
   def self.find_for_stop_and_now(stop_id)
-    stop_trip_ids = Rails.cache.fetch("trips_for_stop_#{stop_id}") { StopTime.trips_for_stop(:key => stop_id, :view => :for_stop_id) }.dup
-    vehicles = VehiclePosition.by_trip_id(:keys => stop_trip_ids, :include_docs => true).docs
-    trip_ids = vehicles.map(&:trip_id)
-    found_trips = Trip.by_trip_id(:keys => trip_ids, :include_docs => true).docs
-    found_stops = StopTime.multiple_trip_stops(:keys => trip_ids, :view => :for_trip_id).all
+    stop_trip_ids = Rails.cache.fetch("trips_for_stop_#{stop_id}") {
+      Rails.logger.info "Fetching trips_for_stop_#{stop_id} from couchdb!"
+      StopTime.trips_for_stop(:key => stop_id, :view => :for_stop_id).all }
+    vehicles = VehiclePosition.by_trip_id(:keys => stop_trip_ids.uniq, :include_docs => true).docs
+    trip_ids = vehicles.map(&:trip_id).uniq.sort
+    trip_ids_keys = "found_calculated_trips_" + Digest::SHA512.hexdigest(trip_ids.to_s)
+    found_trips = Rails.cache.fetch(trip_ids_keys) {
+      Rails.logger.info "Fetching found_calculated_trips_#{trip_ids} from couchdb!"
+      Trip.by_trip_id(:keys => trip_ids, :include_docs => true).docs
+    }.dup
+    trip_stops_keys = "stops_for_trip_list_" + Digest::SHA512.hexdigest(trip_ids.to_s)
+    found_stops = Rails.cache.fetch(trip_stops_keys) {
+      Rails.logger.info "Fetching stops_for_trip_list_#{trip_ids} from couchdb!"
+      StopTime.multiple_trip_stops(:keys => trip_ids, :view => :for_trip_id).all
+    }.dup
     found_trips.each do |ft|
       ft.stops = found_stops[ft.trip_id]
     end
@@ -15,9 +25,9 @@ class CalculatedArrival
       h
     end
     vehicle_trips = found_trips.inject({}) { |memo, val| memo[val.trip_id] = val; memo }
-    vehicle_stuff = vehicles.map do |v|
+    vehicle_stuff = (vehicles.map do |v|
       v.calculate_adjusted_stops(vehicle_trips[v.trip_id])
-    end.flatten
+    end).flatten
     result = vehicle_stuff.map do |ast|
       CalculatedArrival.new(vehicle_trips[ast["trip_id"]], route_names, ast)
     end

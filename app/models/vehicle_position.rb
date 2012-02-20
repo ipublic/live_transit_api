@@ -70,7 +70,7 @@ class VehiclePosition < CouchRest::Model::Base
           vehicle_data_hash.each_pair do |k,v|
             evp = VehiclePosition.by_vehicle_id(:key => k, :include_docs => true).first
             if evp.nil?
-              VehiclePosition.create!(v)
+              VehiclePosition.create(v)
             else
               evp.update_attributes(v)
             end

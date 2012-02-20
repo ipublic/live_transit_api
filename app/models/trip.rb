@@ -24,6 +24,14 @@ class Trip < CouchRest::Model::Base
     view :route_shapes, :map => CouchDocLoader["_design/Trip/views/route_shapes/map.js"], :reduce => CouchDocLoader["_design/Trip/views/route_shapes/reduce.js"]
   end
 
+  def self.trip_collection(keys)
+    trip_ids_key = "trip_collection_" + Digest::SHA512.hexdigest(keys.to_s)
+    Rails.cache.fetch(trip_ids_key) {
+      Rails.logger.info "trip_collection_#{keys.to_s} from couchdb!"
+      Trip.by_trip_id(:keys => keys, :include_docs => true).docs
+    }
+  end
+
   def geometry
     ShapePoint.single_shape(:key => self.shape_id, :view => "by_shape_id").all
   end

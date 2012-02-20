@@ -18,12 +18,11 @@ class ScheduledArrival
       StopTime.by_stop_and_date(:bbox => date_after_bbox).docs }.dup
     trip_ids = (todays.map(&:trip_id) + tomorrows.map(&:trip_id) + yesterdays.map(&:trip_id)).uniq.sort
     trip_ids_key = "schedule_trip_ids_" + Digest::SHA512.hexdigest(trip_ids.to_s)
-    trips =  Rails.cache.fetch(trip_ids_key) {
-      Rails.logger.info "Getting schedule_trip_ids_#{trip_ids.to_s} from couchdb!"
-      Trip.by_trip_id(:keys => trip_ids, :include_docs => true).docs.inject({}) do |h, t|
-      h[t.trip_id] = t
-      h
-    end }
+    trip_models =  Trip.trip_collection(trip_ids)
+    trips = trip_models.inject({}) do |h, t|
+        h[t.trip_id] = t
+        h
+    end
     route_name_trip_ids = trips.values.map(&:route_id).uniq.sort
     route_names = Rails.cache.fetch("route_names_#{route_name_trip_ids.to_s}") {
       Rails.logger.info "Getting route_names_#{route_name_trip_ids.to_s} from couchdb!"
