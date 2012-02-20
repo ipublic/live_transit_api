@@ -18,7 +18,8 @@ class ScheduledArrival
       Rails.logger.info "fetching stop_times#{date_after_bbox.to_s} from couch!"
       StopTime.by_stop_and_date(:bbox => date_after_bbox).docs }.dup
     trip_ids = (todays.map(&:trip_id) + tomorrows.map(&:trip_id) + yesterdays.map(&:trip_id)).uniq.sort
-    trips =  Rails.cache.fetch("schedule_trip_ids_#{trip_ids.to_s}") {
+    trip_ids_key = Digest::SHA512.hexdigest(trip_ids.to_s)
+    trips =  Rails.cache.fetch(trip_ids_key) {
       Rails.logger.info "Getting schedule_trip_ids_#{trip_ids.to_s} from couchdb!"
       Trip.by_trip_id(:keys => trip_ids, :include_docs => true).docs.inject({}) do |h, t|
       h[t.trip_id] = t
