@@ -22,7 +22,7 @@ class VehiclePosition < CouchRest::Model::Base
   before_save :set_id
 
   def setup_id
-    self['_id'] = self['vehicle_id']
+    self['_id'] = "vehicle_" + self['vehicle_id']
   end
 
   def calculate_adjusted_stops(trip)
