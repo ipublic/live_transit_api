@@ -67,15 +67,13 @@ class VehiclePosition < CouchRest::Model::Base
             memo[v['vehicle_id']] = v
             memo
           end
-          existing_vehicles = VehiclePosition.by_vehicle_id(:keys => vehicle_data_hash.keys, :include_docs => true).docs
-
-          existing_vehicle_ids = existing_vehicles.map(&:vehicle_id)
-          existing_vehicles.each do |ev|
-            ev.update_attributes(vehicle_data_hash[ev.vehicle_id])
-          end
-          new_vehicle_ids = vehicle_data_hash.keys.reject { |k| existing_vehicle_ids.include?(k) }
-          new_vehicle_ids.each do |nvid|
-            VehiclePosition.create!(vehicle_data_hash[nvid])
+          vehicle_data_hash.each_pair do |k,v|
+            evp = VehiclePostion.by_vehicle_id(:key => k, :include_docs => true).first
+            if evp.nil?
+              VehiclePosition.create!(vehicle_data_hash[nvid])
+            else
+              evp.update_attributes(v)
+            end
           end
         end
       end
