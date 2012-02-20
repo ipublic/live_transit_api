@@ -66,7 +66,7 @@ class StopTime < CouchRest::Model::Base
     day_val = date_str.gsub("-", "")
     date_key = "#{w_day}.#{day_val}"
     start_t = "240000"
-    end_t = "715959"
+    end_t = "475959"
     start_x = "#{st_id}.#{start_t}"
     end_x = "#{st_id}.#{end_t}"
     [start_x, date_key, end_x, date_key]
