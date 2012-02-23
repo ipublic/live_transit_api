@@ -7,11 +7,7 @@ class CalculatedArrival
       StopTime.trips_for_stop(:key => stop_id, :view => :for_stop_id).all }
     vehicles = VehiclePosition.by_trip_id(:keys => stop_trip_ids.uniq, :include_docs => true).docs
     trip_ids = vehicles.map(&:trip_id).uniq.sort
-    trip_ids_keys = "found_calculated_trips_" + Digest::SHA512.hexdigest(trip_ids.to_s)
-    found_trips = Rails.cache.fetch(trip_ids_keys) {
-      Rails.logger.info "Fetching found_calculated_trips_#{trip_ids} from couchdb!"
-      Trip.by_trip_id(:keys => trip_ids, :include_docs => true).docs
-    }.dup
+    found_trips = Trip.trip_collection(trip_ids)
     trip_stops_keys = "stops_for_trip_list_" + Digest::SHA512.hexdigest(trip_ids.to_s)
     found_stops = Rails.cache.fetch(trip_stops_keys) {
       Rails.logger.info "Fetching stops_for_trip_list_#{trip_ids} from couchdb!"
@@ -20,7 +16,8 @@ class CalculatedArrival
     found_trips.each do |ft|
       ft.stops = found_stops[ft.trip_id]
     end
-    route_names = Route.by_route_id(:keys => found_trips.map(&:route_id)).inject({}) do |h, r|
+    route_ids = found_trips.map(&:route_id).uniq.sort
+    route_names = Route.route_collection(route_ids).inject({}) do |h, r|
       h[r.route_id] = r.route_long_name
       h
     end
