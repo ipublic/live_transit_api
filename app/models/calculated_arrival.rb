@@ -38,6 +38,7 @@ class CalculatedArrival
 
   def initialize(trip, route_names, attr = {})
     @attributes = attr.dup
+    @attributes[:stop_time_id] = attr["_id"]
     @attributes[:vehicle_id] = attr["vehicle_id"]
     @attributes[:trip_id] = trip.trip_id
     @attributes[:route_name] = route_names[trip.route_id]

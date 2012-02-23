@@ -24,6 +24,7 @@
   %calculated_arrivals{ :type => "array" }
     - @arrival.calculated_arrivals.each do |ca|
       %calculated_arrival
+        %stop_time_id= ca[:stop_time_id]
         %route{ :url => url_for(:controller => :routes, :action => :show, :id => ca[:route_id]) }
           %route_id= ca[:route_id]
           %route_name= ca[:route_name]
