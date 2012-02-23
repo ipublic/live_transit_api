@@ -1,6 +1,7 @@
 function (doc) {
   if (doc.type && doc.type == "StopTime") {
     emit(doc.trip_id, {
+        '_id' : doc._id,
         'stop_name' : doc.stop_name,
         'stop_code' : doc.stop_code,
         'stop_id' : doc.stop_id,

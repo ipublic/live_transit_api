@@ -9,6 +9,7 @@
   %scheduled_arrivals{ :type => "array" }
     - @arrival.scheduled_arrivals.each do |sa|
       %scheduled_arrival
+        %stop_time_id= sa[:stop_time_id]
         %route{ :url => url_for(:controller => :routes, :action => :show, :id => sa[:route_id]) }
           %route_id= sa[:route_id]
           %route_name= sa[:route_name]

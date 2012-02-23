@@ -40,6 +40,7 @@ class ScheduledArrival
 
   def initialize(st, trip, route_names, offset=0)
     @attributes = {}
+    @attributes[:stop_time_id] = st['_id']
     @attributes[:stop_id] = st.stop_id
     @attributes[:route_id] = trip.route_id
     @attributes[:route_name] = route_names[trip.route_id]
