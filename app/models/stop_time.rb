@@ -23,6 +23,28 @@ class StopTime < CouchRest::Model::Base
 
   attr_writer :last_stop_name, :trip
 
+  def self.find_for_bbox(search_bbox) 
+    Rails.cache.fetch("stop_times_#{search_bbox.to_s}") {
+      Rails.logger.info "fetching stop_times#{search_bbox.to_s} from couch!"
+      StopTime.by_stop_and_date(:bbox => search_bbox).docs }.dup
+  end
+
+  def self.stops_for_trips(trip_id_list)
+    keys = trip_id_list.uniq.sort
+    trip_stops_keys = "stops_for_trip_list_" + Digest::SHA512.hexdigest(keys.to_s)
+    Rails.cache.fetch(trip_stops_keys) {
+      Rails.logger.info "Fetching stops_for_trip_list_#{keys.to_s} from couchdb!"
+      StopTime.multiple_trip_stops(:keys => keys, :view => :for_trip_id).all
+    }
+  end
+
+  def self.trip_ids_for_stop(stop_id)
+    Rails.cache.fetch("trips_for_stop_#{stop_id}") {
+      Rails.logger.info "Fetching trips_for_stop_#{stop_id} from couchdb!"
+      StopTime.trips_for_stop(:key => stop_id, :view => :for_stop_id).all 
+    }
+  end
+
   def self.find_for_stop_and_date(st_id, date_str)
     results = self.by_stop_and_date(:bbox => calculate_day_bbox(st_id,date_str)).all + self.by_stop_and_date(:bbox => calculate_previous_day_bbox(st_id, date_str)).all
     associated_trips = Trip.by_trip_id.keys(results.map(&:trip_id)).inject({}) do |h, t|

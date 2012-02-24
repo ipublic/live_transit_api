@@ -7,30 +7,20 @@ class ScheduledArrival
     date_of_bbox = StopTime.date_of_day_bbox(st_id, date_str)
     date_before_bbox = StopTime.date_before_day_bbox(st_id, date_str)
     date_after_bbox = StopTime.date_after_day_bbox(st_id, date_str)
-    todays = Rails.cache.fetch("stop_times_#{date_of_bbox.to_s}") {
-      Rails.logger.info "fetching stop_times#{date_of_bbox.to_s} from couch!"
-      StopTime.by_stop_and_date(:bbox => date_of_bbox).docs }.dup
-    yesterdays = Rails.cache.fetch("stop_times_#{date_before_bbox.to_s}") { 
-      Rails.logger.info "fetching stop_times#{date_of_bbox.to_s} from couch!"
-      StopTime.by_stop_and_date(:bbox => date_before_bbox).docs }.dup
-    tomorrows = Rails.cache.fetch("stop_times_#{date_after_bbox.to_s}") { 
-      Rails.logger.info "fetching stop_times#{date_after_bbox.to_s} from couch!"
-      StopTime.by_stop_and_date(:bbox => date_after_bbox).docs }.dup
+    todays = StopTime.find_for_bbox(date_of_bbox)
+    yesterdays = StopTime.find_for_bbox(date_before_bbox)
+    tomorrows = StopTime.find_for_bbox(date_after_bbox)
     trip_ids = (todays.map(&:trip_id) + tomorrows.map(&:trip_id) + yesterdays.map(&:trip_id)).uniq.sort
-    trip_ids_key = "schedule_trip_ids_" + Digest::SHA512.hexdigest(trip_ids.to_s)
     trip_models =  Trip.trip_collection(trip_ids)
     trips = trip_models.inject({}) do |h, t|
         h[t.trip_id] = t
         h
     end
-    route_name_trip_ids = trips.values.map(&:route_id).uniq.sort
-    route_names = Rails.cache.fetch("route_names_#{route_name_trip_ids.to_s}") {
-      Rails.logger.info "Getting route_names_#{route_name_trip_ids.to_s} from couchdb!"
-      Route.by_route_id(:keys => trips.values.map(&:route_id), :include_docs => true).inject({}) do |h, r|
+    found_routes = Route.route_collection(trips.values.map(&:route_id))
+    route_names = found_routes.inject({}) do |h, r|
       h[r.route_id] = r.route_long_name
       h
     end
-    }
     ((
       todays.map { |st| ScheduledArrival.new(st, trips[st.trip_id], route_names) } +
         yesterdays.map { |st| ScheduledArrival.new(st, trips[st.trip_id], route_names, -24) } +

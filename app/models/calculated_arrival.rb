@@ -2,22 +2,11 @@ class CalculatedArrival
   attr_reader :attributes
 
   def self.find_for_stop_and_now(stop_id)
-    stop_trip_ids = Rails.cache.fetch("trips_for_stop_#{stop_id}") {
-      Rails.logger.info "Fetching trips_for_stop_#{stop_id} from couchdb!"
-      StopTime.trips_for_stop(:key => stop_id, :view => :for_stop_id).all }
+    stop_trip_ids = StopTime.trip_ids_for_stop(stop_id)
     vehicles = VehiclePosition.by_trip_with_deviation(:keys => stop_trip_ids.uniq, :include_docs => true).docs
-    trip_ids = vehicles.map(&:trip_id).uniq.sort
-    found_trips = Trip.trip_collection(trip_ids)
-    trip_stops_keys = "stops_for_trip_list_" + Digest::SHA512.hexdigest(trip_ids.to_s)
-    found_stops = Rails.cache.fetch(trip_stops_keys) {
-      Rails.logger.info "Fetching stops_for_trip_list_#{trip_ids} from couchdb!"
-      StopTime.multiple_trip_stops(:keys => trip_ids, :view => :for_trip_id).all
-    }.dup
-    found_trips.each do |ft|
-      ft.stops = found_stops[ft.trip_id]
-    end
-    route_ids = found_trips.map(&:route_id).uniq.sort
-    route_names = Route.route_collection(route_ids).inject({}) do |h, r|
+    trip_ids = vehicles.map(&:trip_id)
+    found_trips = Trip.trip_collection_with_stops(trip_ids)
+    route_names = Route.route_collection(found_trips.map(&:route_id)).inject({}) do |h, r|
       h[r.route_id] = r.route_long_name
       h
     end

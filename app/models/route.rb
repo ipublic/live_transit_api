@@ -15,7 +15,8 @@ class Route < CouchRest::Model::Base
     view :by_route_long_name
   end
 
-  def self.route_collection(route_ids)
+  def self.route_collection(keys)
+    route_ids = keys.uniq.sort
     route_ids_key = "route_collection_" + Digest::SHA512.hexdigest(route_ids.to_s)
     Rails.cache.fetch(route_ids_key) {
       Rails.logger.info "Fetching route_collection_#{route_ids.to_s} from couchdb!"

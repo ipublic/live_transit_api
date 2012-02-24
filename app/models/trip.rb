@@ -24,6 +24,16 @@ class Trip < CouchRest::Model::Base
     view :route_shapes, :map => CouchDocLoader["_design/Trip/views/route_shapes/map.js"], :reduce => CouchDocLoader["_design/Trip/views/route_shapes/reduce.js"]
   end
 
+  def self.trip_collection_with_stops(trip_id_set)
+    keys = trip_id_set.uniq.sort
+    found_trips = Trip.trip_collection(keys)
+    found_stops = StopTime.stops_for_trips(keys)
+    found_trips.each do |ft|
+      ft.stops = found_stops[ft.trip_id]
+    end
+    found_trips
+  end
+
   def self.trip_collection(keys)
     trip_ids_key = "trip_collection_" + Digest::SHA512.hexdigest(keys.to_s)
     Rails.cache.fetch(trip_ids_key) {
