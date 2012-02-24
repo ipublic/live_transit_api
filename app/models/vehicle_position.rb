@@ -78,11 +78,16 @@ class VehiclePosition < CouchRest::Model::Base
             memo[v['vehicle_id']] = v
             memo
           end
+          existing_vehicles = VehiclePosition.by_vehicle_id(:keys => vehicle_data_hash.keys.sort.uniq).docs.inject({}) do |memo, v|
+            memo[v['vehicle_id']] = v
+            memo
+          end
           vehicle_data_hash.each_pair do |k,v|
-            evp = VehiclePosition.by_vehicle_id(:key => k, :include_docs => true).first
+            evp = existing_vehicles[k]
             if evp.nil?
               VehiclePosition.create(v)
             else
+              # Only store the most recent
               if evp.vehicle_position_date_time < v["vehicle_position_date_time"]
                 evp.update_attributes(v)
               end
