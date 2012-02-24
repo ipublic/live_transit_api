@@ -17,12 +17,17 @@ class VehiclePosition < CouchRest::Model::Base
   design do
     view :by_vehicle_id
     view :by_trip_id
+    view :by_trip_with_deviation, :map=> CouchDocLoader["_design/VehiclePosition/views/by_trip_with_deviation/map.js"]
   end
 
   before_save :setup_id
 
   def setup_id
     self['_id'] = "vehicle_" + self['vehicle_id']
+  end
+
+  def last_position_time
+    @last_position_time ||= parse_mssql_date_time(self.vehicle_position_date_time)
   end
 
   def calculate_adjusted_stops(trip)

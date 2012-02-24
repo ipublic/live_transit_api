@@ -5,7 +5,7 @@ class CalculatedArrival
     stop_trip_ids = Rails.cache.fetch("trips_for_stop_#{stop_id}") {
       Rails.logger.info "Fetching trips_for_stop_#{stop_id} from couchdb!"
       StopTime.trips_for_stop(:key => stop_id, :view => :for_stop_id).all }
-    vehicles = VehiclePosition.by_trip_id(:keys => stop_trip_ids.uniq, :include_docs => true).docs
+    vehicles = VehiclePosition.by_trip_with_deviation(:keys => stop_trip_ids.uniq, :include_docs => true).docs
     trip_ids = vehicles.map(&:trip_id).uniq.sort
     found_trips = Trip.trip_collection(trip_ids)
     trip_stops_keys = "stops_for_trip_list_" + Digest::SHA512.hexdigest(trip_ids.to_s)
@@ -29,7 +29,7 @@ class CalculatedArrival
       CalculatedArrival.new(vehicle_trips[ast["trip_id"]], route_names, ast)
     end
     result.select do |ca|
-      ca["stop_id"] == stop_id
+      (ca["stop_id"] == stop_id)
     end
   end
 
