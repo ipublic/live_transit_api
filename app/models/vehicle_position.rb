@@ -83,7 +83,9 @@ class VehiclePosition < CouchRest::Model::Base
             if evp.nil?
               VehiclePosition.create(v)
             else
-              evp.update_attributes(v)
+              if evp.vehicle_position_date_time < v["vehicle_position_date_time"]
+                evp.update_attributes(v)
+              end
             end
           end
         end
