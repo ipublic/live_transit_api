@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+%feed
+  %header
+    %gtfs_realtime_version= "1.0"
+    %incrementalilty= "FULL_DATASET"
+    %timestamp= @lookup_time
+
+  - @trip_updates.each do |tu|
+    %entity{ :id => tu.gtfs_id }
+      %trip_update
+        %trip
+          %trip_id= tu.trip_id
+        - tu.stop_time_updates.each do |stu|
+          %stop_time_update
+            %stop_sequence= stu.stop_sequence
+            %arrival
+              %delay= stu.arrival_delay

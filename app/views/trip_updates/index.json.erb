@@ -1,0 +1,10 @@
+{
+  "header" : {
+    "gtfs_realtime_version": "1.0",
+    "incrementality": "FULL_DATASET",
+    "timestamp" : <%=json @lookup_time %>
+  },
+  "entity" : [
+  <%= render :partial => "trip_updates/trip_update", :collection => @trip_updates, :spacer_template => "shared/json_spacer" %>
+  ]
+}

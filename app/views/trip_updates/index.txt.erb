@@ -1,0 +1,23 @@
+header {
+  gtfs_realtime_version: "1.0"
+  incrementality: FULL_DATASET
+  timestamp: <%= json @lookup_time %>
+}
+<% @trip_updates.each do |tu| %>
+entity {
+  id: <%= json tu.gtfs_id %>
+  trip_update {
+    trip {
+      trip_id : <%= json tu.trip_id %>
+    }
+    <% tu.stop_time_updates.each do |stu| %>
+    stop_time_update {
+      stop_sequence: <%= json stu.stop_sequence %>
+      arrival {
+        delay: <%= json stu.arrival_delay %>
+      }
+    }
+    <% end %>
+  }
+}
+<% end %>

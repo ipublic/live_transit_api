@@ -17,6 +17,7 @@ class VehiclePosition < CouchRest::Model::Base
   design do
     view :by_vehicle_id
     view :by_trip_id
+    view :with_deviation, :map=> CouchDocLoader["_design/VehiclePosition/views/with_deviation/map.js"]
     view :by_trip_with_deviation, :map=> CouchDocLoader["_design/VehiclePosition/views/by_trip_with_deviation/map.js"]
   end
 
