@@ -3,3 +3,6 @@
 
 ## Copyright
 Copyright (c) 2011 Montgomery County, Maryland
+
+## License
+Released under GNU GPLv3
