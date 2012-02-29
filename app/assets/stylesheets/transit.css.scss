@@ -1,3 +1,5 @@
+$borderRad: 1em;
+
 body {
   background-color: #000000;
   color: #ffffff;
@@ -5,6 +7,7 @@ body {
 }
 
 table.schedule_table {
+  border-spacing: 0.5em;
 }
 
 tr.arrival {
@@ -33,4 +36,18 @@ td.late {
 
 td.on_time {
   background-color: #575757;
+}
+
+td.arrival_time {
+  -moz-border-top-left-radius: $borderRad;
+  -moz-border-bottom-left-radius: $borderRad;
+  border-top-left-radius:  $borderRad;
+  border-bottom-left-radius:  $borderRad;
+}
+
+td.arrival_status {
+  -moz-border-top-right-radius:  $borderRad;
+  -moz-border-bottom-right-radius:  $borderRad;
+  border-top-right-radius:  $borderRad;
+  border-bottom-right-radius:  $borderRad;
 }

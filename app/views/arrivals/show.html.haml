@@ -3,13 +3,13 @@
   %tbody
     - @arrival.each_arrival do |ar|
       %tr{ :class => "arrival" }
-        %td{ :class => "ralign" }= ar.arrival_time
+        %td{ :class => "arrival_time" }= ar.arrival_time
         %td
           = ar.headsign
           = " to:"
           %br
           = ar.destination
-        %td{ :class => ar.running_status }
+        %td{ :class => [ar.running_status, "arrival_status"].join(" ") }
           - if ar.on_time?
             On Time
           - else
