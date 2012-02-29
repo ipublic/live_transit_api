@@ -1,9 +1,21 @@
 class CalculatedArrival
   attr_reader :attributes
 
+  def self.all
+    vehicles = VehiclePosition.by_trip_with_deviation(:include_docs => true).docs
+    self.calculate_for_vehicles(vehicles)
+  end
+
   def self.find_for_stop_and_now(stop_id)
     stop_trip_ids = StopTime.trip_ids_for_stop(stop_id)
     vehicles = VehiclePosition.by_trip_with_deviation(:keys => stop_trip_ids.uniq, :include_docs => true).docs
+    result = self.calculate_for_vehicles(vehicles)
+    result.select do |ca|
+      (ca["stop_id"] == stop_id)
+    end
+  end
+
+  def self.calculate_for_vehicles(vehicles)
     trip_ids = vehicles.map(&:trip_id)
     found_trips = Trip.trip_collection_with_stops(trip_ids)
     route_names = Route.route_collection(found_trips.map(&:route_id)).inject({}) do |h, r|
@@ -16,9 +28,6 @@ class CalculatedArrival
     end).flatten
     result = vehicle_stuff.map do |ast|
       CalculatedArrival.new(vehicle_trips[ast["trip_id"]], route_names, ast)
-    end
-    result.select do |ca|
-      (ca["stop_id"] == stop_id)
     end
   end
 

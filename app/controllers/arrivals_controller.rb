@@ -1,7 +1,8 @@
 class ArrivalsController < ApplicationController
   before_filter :authenticate_user!
   def show
-    @arrival = Arrival.find(params[:id])
+    @limit = params[:limit] || "5"
+    @arrival = Arrival.find(params[:id], @limit.to_i)
 
     if @arrival
     respond_to do |format|

@@ -60,8 +60,12 @@ class ScheduledArrival
   def display_time(time_str)
     time_parts = time_str.split(":")
     first_part = time_parts.first.to_i.modulo(24)
-    h_value = (first_part > 12) ? (first_part - 12).to_s : first_part.to_s
-    t_suffix = (first_part > 12) ? "PM" : "AM"
+    h_value = if (first_part == 0)
+                h_value = "12"
+              else
+                (first_part > 12) ? (first_part - 12).to_s : first_part.to_s
+              end
+    t_suffix = (first_part > 11) ? "PM" : "AM"
     [h_value, ":", time_parts[1], t_suffix].join
   end
 
