@@ -50,7 +50,8 @@ class VehiclePosition < CouchRest::Model::Base
         "trip_id" => trip.trip_id,
         "last_stop_name" => trip.last_stop_name,
         "scheduled_time" => schedule_time + offset.seconds,
-        "vehicle_id" => self.vehicle_id
+        "vehicle_id" => self.vehicle_id,
+        "predicted_deviation" => self.predicted_deviation
       })
     end
   end

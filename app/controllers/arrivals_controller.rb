@@ -6,10 +6,7 @@ class ArrivalsController < ApplicationController
 
     if @arrival
     respond_to do |format|
-      format.html {
-        self.formats = [:json]
-        render :content_type => "application/json"
-      }
+      format.html
       format.json
       format.xml
     end

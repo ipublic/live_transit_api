@@ -1,0 +1,21 @@
+%h1{ :class => "stop_header" }= @arrival.stop_name
+%table{ :class => "schedule_table"}
+  %tbody
+    - @arrival.each_arrival do |ar|
+      %tr{ :class => "arrival" }
+        %td{ :class => "ralign" }= ar.arrival_time
+        %td
+          = ar.headsign
+          = " to:"
+          %br
+          = ar.destination
+        %td{ :class => ar.running_status }
+          - if ar.on_time?
+            On Time
+          - else
+            = pluralize(ar.predicted_deviation.abs, "minute")
+            = ar.running_status
+            %br
+            = ar.adjusted_time
+
+          

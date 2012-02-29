@@ -18,7 +18,7 @@ class ScheduledArrival
     end
     found_routes = Route.route_collection(trips.values.map(&:route_id))
     route_names = found_routes.inject({}) do |h, r|
-      h[r.route_id] = r.route_long_name
+      h[r.route_id] = r
       h
     end
     ((
@@ -33,14 +33,15 @@ class ScheduledArrival
     @attributes[:stop_time_id] = st['_id']
     @attributes[:stop_id] = st.stop_id
     @attributes[:route_id] = trip.route_id
-    @attributes[:route_name] = route_names[trip.route_id]
+    @attributes[:route_short_name] = route_names[trip.route_id].route_short_name
+    @attributes[:route_name] = route_names[trip.route_id].route_long_name
     @attributes[:destination_stop_name] = trip.last_stop_name
     @attributes[:arrival_time] = offset_time(st.arrival_time, offset)
     @attributes[:departure_time] = offset_time(st.departure_time, offset)
     @attributes[:trip_id] = st.trip_id
     @attributes[:trip_headsign] = trip.trip_headsign
     @attributes[:scheduled_display_time] = display_time(st.arrival_time)
-    @attributes[:message] = "#{@attributes[:scheduled_display_time]} #{@attributes[:route_name]} to #{trip.last_stop_name}"
+    @attributes[:message] = "#{@attributes[:scheduled_display_time]} #{@attributes[:trip_headsign]} to #{trip.last_stop_name}"
   end
 
   def [](key)

@@ -1,0 +1,36 @@
+body {
+  background-color: #000000;
+  color: #ffffff;
+  font-family: sans-serif;
+}
+
+table.schedule_table {
+}
+
+tr.arrival {
+  background-color: #105cb6;
+  td {
+    padding: 0.5em;
+  }
+}
+
+.ralign {
+  text-align: right;
+}
+
+h1.stop_header {
+  border-bottom: solid #ffffff;
+}
+
+td.early {
+  /* background-color: #575757; */
+  background-color: #990000;
+}
+
+td.late {
+  background-color: #990000;
+}
+
+td.on_time {
+  background-color: #575757;
+}
