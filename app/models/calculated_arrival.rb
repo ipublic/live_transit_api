@@ -26,7 +26,7 @@ class CalculatedArrival
     vehicle_stuff = (vehicles.map do |v|
       v.calculate_adjusted_stops(vehicle_trips[v.trip_id])
     end).flatten
-    result = vehicle_stuff.map do |ast|
+    vehicle_stuff.map do |ast|
       CalculatedArrival.new(vehicle_trips[ast["trip_id"]], route_names, ast)
     end
   end
