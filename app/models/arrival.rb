@@ -7,8 +7,14 @@ class Arrival
   def self.find(st_code, limit=5)
     stop = Stop.find_by_stop_code(st_code.to_s)
     return(nil) unless stop
+#    RubyProf.start
     scheduled_arrivals = ScheduledArrival.find_for_stop_and_now(stop.stop_id)
     calculated_arrivals = CalculatedArrival.find_for_stop_and_now(stop.stop_id)
+#    res = RubyProf.stop
+#    printer = RubyProf::GraphHtmlPrinter.new(res)
+#    rf = File.open("profile.html", 'w')
+#    printer.print(rf)
+#    rf.close
     Arrival.new(stop, scheduled_arrivals, calculated_arrivals, limit)
   end
 

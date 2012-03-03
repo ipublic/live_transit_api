@@ -26,7 +26,8 @@ class StopTime < CouchRest::Model::Base
   def self.find_for_bbox(search_bbox) 
     Rails.cache.fetch("stop_times_#{search_bbox.to_s}") {
       Rails.logger.info "fetching stop_times#{search_bbox.to_s} from couch!"
-      StopTime.by_stop_and_date(:bbox => search_bbox).docs }.dup
+      StopTime.by_stop_and_date(:bbox => search_bbox).all
+    }.dup
   end
 
   def self.stops_for_trips(trip_id_list)
