@@ -31,6 +31,10 @@ class VehiclePosition < CouchRest::Model::Base
     @last_position_time ||= parse_mssql_date_time(self.vehicle_position_date_time)
   end
 
+  def gtfs_timestamp
+    last_position_time.to_i
+  end
+
   def calculate_adjusted_stops(trip)
     return([]) if self.predicted_deviation == 63
     allowable_stops = []
@@ -103,6 +107,10 @@ end
 
 def to_param
   vehicle_id
+end
+
+def gtfs_id
+  "vehicle_position_#{self.vehicle_id}"
 end
 
 end

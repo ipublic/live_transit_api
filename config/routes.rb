@@ -8,7 +8,7 @@ LiveTransitApi::Application.routes.draw do
   resources :trips, :only => [:show]
   resources :routes, :only => [:show, :index]
   resources :stops, :only => [:show, :index]
-  resources :trip_updates, :only => :index
+  resource :gtfs_realtime, :only => :show, :controller => "GtfsRealtime"
 
   # Sample of regular route:
   #   match 'products/:id' => 'catalog#view'
