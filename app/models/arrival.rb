@@ -31,12 +31,17 @@ class Arrival
 
   def each_arrival
     base_time = Time.now
+    sa_idx = @scheduled_arrivals.first(@limit * 3).inject({}) do |memo, sa|
+      memo[sa[:stop_time_id]] = sa
+      memo
+    end
     ca_idx = @calculated_arrivals.inject({}) do |memo, ca|
       memo[ca[:stop_time_id]] = ca
       memo
     end
-    all_cas = @scheduled_arrivals.first(@limit * 2).map { |sa| CompositeArrival.new(sa, ca_idx[sa[:stop_time_id]]) }
-    composite_arrivals = all_cas.reject { |ca| ca.before?(base_time) }.first(@limit)
+    both_cas = sa_idx.keys.map { |idx| SignArrival.calculate(sa_idx[idx], ca_idx[idx]) }
+    calc_only_cas =  (ca_idx.keys - sa_idx.keys).map { |idx| SignArrival.calculate(nil, ca_idx[idx]) }
+    composite_arrivals = (both_cas + calc_only_cas).reject { |ca| ca.time < base_time }.sort_by(&:time).first(@limit)
     composite_arrivals.each do |comp_a|
       yield comp_a
     end

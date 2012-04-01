@@ -40,6 +40,7 @@ class ScheduledArrival
     @attributes[:departure_time] = offset_time(st.departure_time, offset)
     @attributes[:trip_id] = st.trip_id
     @attributes[:trip_headsign] = trip.trip_headsign
+    @attributes[:scheduled_time] = calculate_time(st.arrival_time, offset)
     @attributes[:scheduled_display_time] = display_time(st.arrival_time)
     @attributes[:message] = "#{@attributes[:scheduled_display_time]} #{@attributes[:trip_headsign]} to #{trip.last_stop_name}"
   end
@@ -76,4 +77,14 @@ class ScheduledArrival
     ([first_part.to_s.rjust(2, "0")] + time_parts[1..-1]).join(":")
   end
 
+  def calculate_time(arrival, offset)
+    t_offset = get_offset(arrival) + (offset * 60 * 60)
+    c_day = Date.today
+    Time.mktime(c_day.year, c_day.month, c_day.day) + t_offset.seconds
+  end
+
+  def get_offset(t_val)
+    vals = t_val.split(":").map(&:to_i)
+    vals[2] + (vals[1] * 60) + (vals[0] * 60 * 60)
+  end
 end
