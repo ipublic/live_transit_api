@@ -1,3 +1,12 @@
+- content_for :page_css do
+  :css
+    body {
+      background-color: #000000;
+      color: #ffffff;
+      font-family: sans-serif;
+    }
+
+
 %h1{ :class => "stop_header" }= @arrival.stop_name
 %table{ :class => "schedule_table"}
   %tbody

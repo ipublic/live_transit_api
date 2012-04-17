@@ -1,11 +1,12 @@
 $borderRad: 1em;
-
+/*
+Moved to inline to avoid global changes
 body {
   background-color: #000000;
   color: #ffffff;
   font-family: sans-serif;
 }
-
+*/
 table.schedule_table {
   border-spacing: 0.5em;
 }
