@@ -1,7 +1,7 @@
 header {
   gtfs_realtime_version: "1.0"
   incrementality: FULL_DATASET
-  timestamp: <%= json @lookup_time %>
+  timestamp: <%= json @lookup_time.to_i %>
 }
 <% @gtfs_realtime.trip_updates.each do |tu| %>
 entity {
