@@ -27,6 +27,14 @@ class VehiclePosition < CouchRest::Model::Base
     self['_id'] = "vehicle_" + self['vehicle_id']
   end
 
+  def latest_report_time
+    [last_position_time].max
+  end
+
+  def last_event_time
+    @last_event_time ||= parse_mssql_date_time(self.incident_date_time)
+  end
+
   def last_position_time
     @last_position_time ||= parse_mssql_date_time(self.vehicle_position_date_time)
   end

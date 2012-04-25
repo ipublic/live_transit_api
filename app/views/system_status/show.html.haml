@@ -1,0 +1,17 @@
+%h2 System Status
+%hr
+%p
+  Retrieved at
+  = @system_status.report_time
+
+%h2 Vehicle Reporting Status
+%table
+  %thead
+    %tr
+      %th Window
+      %th Number Of Vehicles
+  %tbody
+    - @system_status.vehicle_reporting_buckets.each do |vrb|
+      %tr
+        %td= vrb.first
+        %td= vrb.last
