@@ -80,7 +80,8 @@ class VehiclePosition < CouchRest::Model::Base
     if !params.nil?
       if !params["NewDataSet"].nil?
         if !params["NewDataSet"]["Table"].nil?
-          all_records = params["NewDataSet"]["Table"]
+          table_result = params["NewDataSet"]["Table"]
+          all_records = table_result.kind_of?(Hash) ? [ table_result ] : table_result
           vehicle_data_hash = all_records.inject({}) do |memo, v|
             memo[v['vehicle_id']] = v
             memo
