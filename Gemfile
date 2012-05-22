@@ -12,7 +12,7 @@ gem 'mezza-rubyzip', '0.9.4.1'
 gem 'haml', '3.1.3'
 gem 'multi_json', '1.0.4'
 gem 'dalli'
-# gem 'ruby-prof'
+gem 'ruby-protocol-buffers'
 
 # Bundle edge Rails instead:
 # gem 'rails',     :git => 'git://github.com/rails/rails.git'

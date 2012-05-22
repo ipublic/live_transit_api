@@ -9,9 +9,10 @@ set :copy_exclude, [".git/*", "Gemfile.lock", "config/couchdb.yml"]
 
 default_run_options[:shell] = false
 
-role :web, "172.30.12.210"
-role :app, "172.30.12.210"
-role :db, "172.30.12.210", :primary => true
+set :deploy_ip, "x.x.x.x"
+role :web, deploy_ip
+role :app, deploy_ip
+role :db, deploy_ip, :primary => true
 after "deploy", "deploy:cleanup"
 
 namespace :deploy do

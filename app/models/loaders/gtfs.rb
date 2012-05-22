@@ -39,24 +39,35 @@ class Loaders::Gtfs
     st_file.close!
     @contained_files["stop_times.txt"].extract(st_file_path)
     @contained_files["trips.txt"].extract(t_file_path)
+    puts "Start Stops"
     stop_codes = Loaders::StopsProcessor.load(
       @contained_files["stops.txt"].get_input_stream.read
     )
+    puts "Stops Done"
+    puts "Start Routes"
     Loaders::RoutesProcessor.load(
       @contained_files["routes.txt"].get_input_stream.read
     )
+    puts "Routes Done"
+    puts "Start Shapes"
     Loaders::ShapesProcessor.load(
       @contained_files["shapes.txt"].get_input_stream.read
     )
+    puts "Shapes Done"
+    puts "Start Calendar"
     sp = Loaders::ServiceProcessor.new(
       @contained_files["calendar.txt"].get_input_stream.read,
       @contained_files["calendar_dates.txt"].get_input_stream.read
     )
+    puts "Calendar Done"
+    puts "Start Trips"
     tp = Loaders::TripProcessor.new(
       t_file_path,
       sp.keyed_services
     )
     t_file.unlink
+    puts "Trips Done"
+    puts "Start StopTimes"
     st = Loaders::StopTimeProcessor.load(
       st_file_path,
       tp.trip_schedules,
@@ -64,6 +75,7 @@ class Loaders::Gtfs
       stop_codes
     )
     st_file.unlink
+    puts "StopTimes Done"
     tp.process_additional_records_and_persist(st)
     nil
   end

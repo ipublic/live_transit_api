@@ -5,3 +5,4 @@
 # Mime::Type.register_alias "text/html", :iphone
 Mime::Type.register_alias "application/json", :geojson
 Mime::Type.register_alias "text/plain", :txt
+Mime::Type.register_alias "application/x-protobuf", :pb
