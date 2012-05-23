@@ -9,4 +9,13 @@ class Gtfs::StopTimeUpdate
     # Flip the sign convention and turn from minutes => seconds
     @arrival_delay = delay * -60
   end
+
+  def feed
+    TransitRealtime::TripUpdate::StopTimeUpdate.new({
+      :stop_sequence => @stop_sequence,
+      :arrival => TransitRealtime::TripUpdate::StopTimeEvent.new({
+        :delay => @arrival_delay
+      })
+    })
+  end
 end

@@ -5,8 +5,8 @@ class GtfsRealtimeController < ApplicationController
 
     respond_to do |format|
       format.html {
-        self.formats = [:txt]
-        render :content_type => "text/plain"
+        self.formats = [:pb]
+        send_data(@gtfs_realtime.binary_feed, :file_name => "gtfs_realtime.pb", :content_type => "application/x-protobuf", :disposition => "inline")
       }
       format.txt
     end

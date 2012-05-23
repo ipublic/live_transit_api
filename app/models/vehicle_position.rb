@@ -122,4 +122,25 @@ def gtfs_id
   "vehicle_position_#{self.vehicle_id}"
 end
 
+def feed
+  TransitRealtime::FeedEntity.new({
+    :id => gtfs_id,
+    :vehicle => TransitRealtime::VehiclePosition.new({
+      :trip => TransitRealtime::TripDescriptor.new({
+        :trip_id => trip_id
+      }),
+      :vehicle => TransitRealtime::VehicleDescriptor.new({
+        :id => vehicle_id
+      }),
+      :position => TransitRealtime::Position.new({
+        :latitude => latitude.to_f,
+        :longitude => longitude.to_f,
+        :bearing => heading.to_f,
+        :speed => speed.to_f
+      }),
+      :timestamp => gtfs_timestamp
+    })
+  })
+end
+
 end

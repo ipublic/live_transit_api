@@ -20,5 +20,17 @@ class Gtfs::TripUpdate
   def gtfs_id
    "trip_#{trip_id}_stop_time_update"
   end
+
+  def feed
+    TransitRealtime::FeedEntity.new({
+      :id => gtfs_id,
+      :trip_update => TransitRealtime::TripUpdate.new({
+        :trip => TransitRealtime::TripDescriptor.new({
+          :trip_id => @trip_id
+        }),
+        :stop_time_update => @stop_time_updates.map(&:feed)
+      })
+    })
+  end
   
 end
