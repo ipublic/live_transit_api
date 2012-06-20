@@ -3,8 +3,9 @@ function(doc) {
     for (var i = 0; i < doc.schedules.length; i++) {
       var startd = parseFloat(doc.schedules[i].day_type.toString() + "." + doc.schedules[i].start_date.replace(/-/g, ""));
       var endd = parseFloat(doc.schedules[i].day_type.toString() + "." + doc.schedules[i].end_date.replace(/-/g, ""));
-      var start_time = parseFloat(doc.stop_id + "." + doc.arrival_time.replace(/:/g, ""));      
-      var end_time = parseFloat(doc.stop_id + "." + doc.departure_time.replace(/:/g, ""));      
+      var stop_val = doc.stop_id.replace(/[^0-9]+/g, "000");
+      var start_time = parseFloat(stop_val + "." + doc.arrival_time.replace(/:/g, ""));      
+      var end_time = parseFloat(stop_val + "." + doc.departure_time.replace(/:/g, ""));      
 
       emit(                                                                                         
           {

@@ -61,11 +61,12 @@ class StopTime < CouchRest::Model::Base
   def self.date_of_day_bbox(st_id, date_str)
     w_day = Time.strptime(date_str, "%Y-%m-%d").wday
     day_val = date_str.gsub("-", "")
+    st_val = st_id.gsub(/[^0-9]+/, "000")
     date_key = "#{w_day}.#{day_val}"
     start_t = "0"
     end_t = "475959"
-    start_x = "#{st_id}.#{start_t}"
-    end_x = "#{st_id}.#{end_t}"
+    start_x = "#{st_val}.#{start_t}"
+    end_x = "#{st_val}.#{end_t}"
     [start_x, date_key, end_x, date_key]
   end
 
@@ -77,8 +78,9 @@ class StopTime < CouchRest::Model::Base
     date_key = "#{w_day}.#{day_val}"
     start_t = "0"
     end_t = "235959"
-    start_x = "#{st_id}.#{start_t}"
-    end_x = "#{st_id}.#{end_t}"
+    st_val = st_id.gsub(/[^0-9]+/, "000")
+    start_x = "#{st_val}.#{start_t}"
+    end_x = "#{st_val}.#{end_t}"
     [start_x, date_key, end_x, date_key]
   end
 
@@ -90,8 +92,9 @@ class StopTime < CouchRest::Model::Base
     date_key = "#{w_day}.#{day_val}"
     start_t = "240000"
     end_t = "475959"
-    start_x = "#{st_id}.#{start_t}"
-    end_x = "#{st_id}.#{end_t}"
+    st_val = st_id.gsub(/[^0-9]+/, "000")
+    start_x = "#{st_val}.#{start_t}"
+    end_x = "#{st_val}.#{end_t}"
     [start_x, date_key, end_x, date_key]
   end
 
