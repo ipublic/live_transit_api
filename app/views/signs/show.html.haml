@@ -1,0 +1,26 @@
+- content_for :page_css do
+  :css
+    body {
+      background-color: #000000;
+      color: #ffffff;
+      font-family: sans-serif;
+    }
+
+
+%h1{ :class => "stop_header" }= @sign.stop_name
+%table{ :class => "schedule_table"}
+  %tbody
+    - @sign.each_arrival do |ar|
+      %tr{ :class => "arrival" }
+        %td{ :class => "arrival_time" }= ar.display_time
+        %td
+          = ar.route_name
+          = " to:"
+          %br
+          = ar.trip_headsign
+        %td{ :class => [ar.running_status, "arrival_status"].join(" ") }
+          - if ar.on_time?
+            On Time
+          - else
+            = pluralize(ar.deviation.abs, "minute")
+            = ar.running_status

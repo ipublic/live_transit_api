@@ -13,6 +13,7 @@ gem 'haml', '3.1.3'
 gem 'multi_json', '1.0.4'
 gem 'dalli'
 gem 'ruby-protocol-buffers'
+gem 'nokogiri'
 
 # Bundle edge Rails instead:
 # gem 'rails',     :git => 'git://github.com/rails/rails.git'
