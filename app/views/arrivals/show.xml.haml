@@ -13,6 +13,7 @@
         %route{ :url => url_for(:controller => :routes, :action => :show, :id => sa[:route_id]) }
           %route_id= sa[:route_id]
           %route_name= sa[:route_name]
+          %route_short_name= sa[:route_short_name]
         %trip{ :url => url_for(:controller => :trips, :action => :show, :id => sa[:trip_id]) }
           %trip_id= sa[:trip_id]
           %trip_headsign= sa[:trip_headsign]
@@ -28,6 +29,7 @@
         %route{ :url => url_for(:controller => :routes, :action => :show, :id => ca[:route_id]) }
           %route_id= ca[:route_id]
           %route_name= ca[:route_name]
+          %route_short_name= ca[:route_short_name]
         %trip{ :url => url_for(:controller => :trips, :action => :show, :id => ca[:trip_id]) }
           %trip_id= ca[:trip_id]
           %trip_headsign= ca[:trip_headsign]

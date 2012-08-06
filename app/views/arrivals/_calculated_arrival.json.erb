@@ -3,6 +3,7 @@
   "route" : {
     "route_id" : <%=json calculated_arrival[:route_id] %>,
     "route_name" : <%= json calculated_arrival[:route_name] %>,
+    "route_short_name" : <%= json calculated_arrival[:route_short_name] %>,
     "url" : <%= json url_for(:controller => :routes, :action => :show, :id => calculated_arrival[:route_id]) %>
   },
   "trip" : {
