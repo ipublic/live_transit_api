@@ -14,7 +14,7 @@ class Loaders::Gtfs
   end
 
   def do_import!
-    reinit_databases
+#    reinit_databases
     process_data
   end
 
@@ -26,8 +26,8 @@ class Loaders::Gtfs
       cls.first
     end
     sleep 2
-    target_db.recreate!
-    import_db.replicate_to(target_db, true)
+#    target_db.recreate!
+#    import_db.replicate_to(target_db, true)
   end
 
   def process_data
