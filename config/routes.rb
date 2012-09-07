@@ -8,6 +8,8 @@ LiveTransitApi::Application.routes.draw do
   resources :trips, :only => [:show]
   resources :routes, :only => [:show, :index]
   resources :stops, :only => [:show, :index]
+  resource :gtfs_trip_updates, :only => :show, :controller => "GtfsTripUpdates"
+  resource :gtfs_vehicle_positions, :only => :show, :controller => "GtfsVehiclePositions"
   resource :gtfs_realtime, :only => :show, :controller => "GtfsRealtime"
   resource :system_status, :only => :show, :controller => "SystemStatus"
 
