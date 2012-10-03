@@ -5,7 +5,7 @@ class CreateRoutes < ActiveRecord::Migration
       t.string :agency_id, :limit => 255, :null => true
       t.string :route_short_name, :limit => 255, :null => false
       t.string :route_long_name, :limit => 1024, :null => false
-      t.text :route_long_name
+      t.text :route_desc
       t.integer :route_type, :null => false
       t.string :route_url, :limit => 1024, :null => true
       t.string :route_color, :limit => 255, :null => true

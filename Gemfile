@@ -15,6 +15,7 @@ gem 'dalli'
 gem 'ruby-protocol-buffers'
 gem 'pg', '0.14.1'
 gem 'foreigner', '1.2.1'
+gem 'activerecord-import'
 
 # Bundle edge Rails instead:
 # gem 'rails',     :git => 'git://github.com/rails/rails.git'

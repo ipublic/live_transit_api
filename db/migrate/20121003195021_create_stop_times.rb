@@ -3,6 +3,7 @@ class CreateStopTimes < ActiveRecord::Migration
     create_table :stop_times do |t|
       t.string :stop_id, :limit => 255, :null => false
       t.string :trip_id, :limit => 255, :null => false
+      t.integer :stop_sequence, :null => false
       t.string :arrival_time, :limit => 255, :null => false
       t.string :departure_time, :limit => 255, :null => false
       t.string :stop_headsign, :limit => 512, :null => true

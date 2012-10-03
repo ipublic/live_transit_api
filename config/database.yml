@@ -45,3 +45,12 @@ test:
   pool: 5
   username: postgres
   password: Kermit12
+
+production:
+  adapter: postgresql
+  encoding: unicode
+  database: live_transit_api_prod
+  pool: 5
+  username: postgres
+  password: Kermit12
+
