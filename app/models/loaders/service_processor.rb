@@ -5,10 +5,11 @@ class Loaders::ServiceProcessor
   attr_reader :exception_records
   attr_reader :services
   attr_reader :keyed_services
+  attr_reader :enumerated_services
 
   def initialize(service_data, exceptions_data)
     @service_records = []
-    CSV.parse(service_data, {:headers => true, :header_converters => :symbol}) do |row|
+    CSV.foreach(service_data, {:headers => true, :header_converters => :symbol}) do |row|
       @service_records.push(
         Loaders::ServiceRecord.new(
           row.to_hash
@@ -16,7 +17,7 @@ class Loaders::ServiceProcessor
       )
     end
     @exception_records = []
-    CSV.parse(exceptions_data, {:headers => true, :header_converters => :symbol}) do |row|
+    CSV.foreach(exceptions_data, {:headers => true, :header_converters => :symbol}) do |row|
       @exception_records.push(
         Loaders::ServiceExceptionRecord.new(
           row.to_hash
@@ -25,6 +26,10 @@ class Loaders::ServiceProcessor
     end
     @services = normalize_services(@service_records, @exception_records)
     @keyed_services = Hash.new([])
+    keyed_raw_services = @services.inject(Hash.new([])) do |m, sr|
+      m[sr.service_id] = m[sr.service_id] + [sr]
+      m
+    end
     @services.each do |serv|
       @keyed_services[serv.service_id] = @keyed_services[serv.service_id] + [
         ScheduleDayRange.new({
@@ -34,7 +39,10 @@ class Loaders::ServiceProcessor
         })
       ]
     end
-
+    @enumerated_services = {}
+    keyed_raw_services.each_pair do |k, v|
+      @enumerated_services[k] = enumerate_service_days(v)
+    end
   end
 
   def normalize_services(service_records, service_exceptions)
@@ -52,5 +60,15 @@ class Loaders::ServiceProcessor
       })
     end)
     all_ranges
+  end
+
+  def enumerate_service_days(day_ranges)
+    first_day = day_ranges.min { |r| r.start_date }.start_date
+    last_day = day_ranges.max { |l| l.end_date }.end_date
+    days_range = (first_day..last_day)
+    days_range.select do |aday|
+      day_ranges.any? { |dr| dr.includes_date?(aday) }
+    end
+    days_range.map { |d| d.to_time.to_i }
   end
 end

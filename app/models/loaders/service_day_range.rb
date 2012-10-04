@@ -44,6 +44,11 @@ class Loaders::ServiceDayRange
       @range.include?(service_exception.date)
   end
 
+  def includes_date?(compared_date)
+    @day_type == compared_date.wday &&
+    @range.include?(compared_date)
+  end
+
   def ==(other)
     return false unless other.kind_of?(self.class)
     @service_id == other.service_id &&
