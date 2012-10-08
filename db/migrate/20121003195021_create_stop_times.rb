@@ -11,10 +11,6 @@ class CreateStopTimes < ActiveRecord::Migration
       t.integer :drop_off_type, :null => true
       t.float :shape_dist_traveled, :null => true
     end
-    change_table :stop_times do |t|
-      t.foreign_key :stops, :column => :stop_id, :primary_key => :stop_id
-      t.foreign_key :trips, :column => :trip_id, :primary_key => :trip_id
-    end
 
     add_index :stop_times, :stop_id
     add_index :stop_times, :trip_id

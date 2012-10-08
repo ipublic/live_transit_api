@@ -3,7 +3,7 @@ class CreateTrips < ActiveRecord::Migration
     create_table :trips do |t|
       t.string :trip_id, :limit => 255, :null => false
       t.string :route_id, :limit => 255, :null => false
-      t.string :service_id, :limit => 255, :null => false
+      t.integer :service_id, :null => false
       t.string :trip_headsign, :limit => 512, :null => true
       t.string :trip_short_name, :limit => 512, :null => true
       t.integer :direction_id, :null => true

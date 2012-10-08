@@ -66,9 +66,9 @@ class Loaders::ServiceProcessor
     first_day = day_ranges.min { |r| r.start_date }.start_date
     last_day = day_ranges.max { |l| l.end_date }.end_date
     days_range = (first_day..last_day)
-    days_range.select do |aday|
+    selected_days = days_range.select do |aday|
       day_ranges.any? { |dr| dr.includes_date?(aday) }
     end
-    days_range.map { |d| d.to_time.to_i }
+    selected_days.map { |d| d.to_time.to_i }
   end
 end

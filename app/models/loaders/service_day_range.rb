@@ -18,13 +18,13 @@ class Loaders::ServiceDayRange
     return [self] unless self.includes?(service_exception)
     return [] if (self.end_date - self.start_date == 0)
     if self.end_date == service_exception.date
-      [new_range_for_dates(@start_date, @end_date - 1)]
+      [new_range_for_dates(@start_date, @end_date - 1.day)]
     elsif self.start_date == service_exception.date
-      [new_range_for_dates(@start_date + 1, @end_date)]
+      [new_range_for_dates(@start_date + 1.day, @end_date)]
     else
       [
-        new_range_for_dates(@start_date, service_exception.date - 1),
-        new_range_for_dates(service_exception.date + 1, @end_date)
+        new_range_for_dates(@start_date, service_exception.date - 1.day),
+        new_range_for_dates(service_exception.date + 1.day, @end_date)
       ]
     end
   end

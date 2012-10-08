@@ -1,7 +1,7 @@
 class CreateTripDays < ActiveRecord::Migration
   def up
     create_table :trip_days do |t|
-      t.string :service_id, :limit => 255, :null => false
+      t.integer :service_id, :null => false
       t.integer :day, :null => false
     end
 
