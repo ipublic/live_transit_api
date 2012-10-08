@@ -95,4 +95,52 @@ task :import_data => :environment do
   end
   StopTime.import columns, stop_times, :validate => false
   puts "#{total} stop times in"
+  puts "Building stop_time_services"
+  ActiveRecord::Base.connection.execute <<-SQLCODE
+insert into stop_time_services
+select st.id, st.stop_id, t.service_id, st.arrival_time, st.departure_time from stop_times st
+join trips t on t.trip_id = st.trip_id
+  SQLCODE
+  puts "Done stop_time_services"
+  ActiveRecord::Base.connection.execute <<-SQLCODE
+  alter table stop_time_events add column id serial
+  SQLCODE
+  puts "Added stop_time_events id"
+  puts "Building stop_time_events"
+  ActiveRecord::Base.connection.execute <<-SQLCODE
+  insert into stop_time_events
+  select sc.stop_time_id, sc.stop_id, (td.day + sc.arrival_time), (td.day + sc.departure_time) from
+  stop_time_services sc
+  inner join trip_days td on sc.service_id = td.service_id
+  SQLCODE
+  puts "Done stop_time_events"
+  puts "Building stop_time_events primary key"
+  ActiveRecord::Base.connection.execute <<-SQLCODE
+  alter table stop_time_events add primary key (id)
+  SQLCODE
+  puts "Done stop_time_events primary key"
+  puts "Building stop_time_events index on stop_time_id"
+  ActiveRecord::Base.connection.execute <<-SQLCODE
+  create index index_stop_time_events_on_stop_time_id
+  on stop_time_events (stop_time_id)
+  SQLCODE
+  puts "Done stop_time_events index on stop_time_id"
+  puts "Building stop_time_events index on stop_id"
+  ActiveRecord::Base.connection.execute <<-SQLCODE
+  create index index_stop_time_events_on_stop_id
+  on stop_time_events (stop_id)
+  SQLCODE
+  puts "Done stop_time_events index on stop_id"
+  puts "Building stop_time_events index on arrival_time"
+  ActiveRecord::Base.connection.execute <<-SQLCODE
+  create index index_stop_time_events_on_arrival_time
+  on stop_time_events (arrival_time)
+  SQLCODE
+  puts "Done stop_time_events index on arrival_time"
+  puts "Building stop_time_events index on departure_time"
+  ActiveRecord::Base.connection.execute <<-SQLCODE
+  create index index_stop_time_events_on_departure_time
+  on stop_time_events (departure_time)
+  SQLCODE
+  puts "Done stop_time_events index on departure_time"
 end
