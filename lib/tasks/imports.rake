@@ -2,6 +2,23 @@ require 'csv'
 
 desc "Import Data"
 task :import_data => :environment do
+  started_at_time = Time.now
+  puts "Started at #{started_at_time}"
+  spoints = []
+  total = 0 
+  puts "Import shape points..."
+  CSV.foreach("shapes.txt", {:headers => true}) do |row|
+    total += 1
+    spoints << ShapePoint.new(row.to_hash)
+    if total % 5000 == 0
+      ShapePoint.import spoints, :validate => false
+      spoints = []
+      puts "#{total} shape points in"
+    end
+  end
+  ShapePoint.import spoints, :validate => false
+  puts "#{total} shape points in"
+  puts "Import schedules"
   agencies = []
   puts "Import agencies...."
   CSV.foreach("agency.txt", {:headers => true}) do |row|
@@ -143,4 +160,7 @@ join trips t on t.trip_id = st.trip_id
   on stop_time_events (departure_time)
   SQLCODE
   puts "Done stop_time_events index on departure_time"
+  ended_at_time = Time.now
+  puts "Started at #{started_at_time}"
+  puts "Ended at #{ended_at_time}"
 end
