@@ -7,4 +7,8 @@ class Stop < ActiveRecord::Base
       :coordinates => [stop_lon, stop_lat]
     }
   end
+
+  def to_param
+    self.stop_code
+  end
 end

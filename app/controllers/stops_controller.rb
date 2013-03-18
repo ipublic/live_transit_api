@@ -3,7 +3,7 @@ class StopsController < ApplicationController
   def index
     @stops = Rails.cache.fetch("all_stops") { 
       Rails.logger.info "Looking up all stops"
-      Stop.all(:include_docs => true).docs }
+      Stop.all }
 
     respond_to do |format|
       format.html {

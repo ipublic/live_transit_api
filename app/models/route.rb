@@ -13,4 +13,8 @@ class Route < ActiveRecord::Base
   def self.by_route_id(r_id)
     self.for_route_id(r_id).first
   end
+
+  def to_param
+    self.route_id
+  end
 end

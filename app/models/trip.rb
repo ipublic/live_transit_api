@@ -28,4 +28,8 @@ class Trip < ActiveRecord::Base
   def last_stop_name
     stop_times.any? ? stop_times.last.stop.stop_name : null
   end
+
+  def to_param
+    self.trip_id
+  end
 end

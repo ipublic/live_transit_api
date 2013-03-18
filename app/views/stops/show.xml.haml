@@ -19,5 +19,5 @@
         %stop_sequence{ :type => "integer" }= stime["stop_sequence"]
         %trip{ :link => url_for(:controller => :trips, :action => :show, :id => stime["trip_id"]) }
           %trip_id= stime["trip_id"]
-        %route{ :link => url_for(:controller => :routes, :action => :show, :id => stime["route_id"]) }
-          %route_id= stime["route_id"]
+        %route{ :link => url_for(:controller => :routes, :action => :show, :id => stime.trip.route_id) }
+          %route_id= stime.trip.route_id
