@@ -10,19 +10,19 @@
 %end_time= trip.end_time
 %first_stop_name= trip.first_stop_name
 %last_stop_name= trip.last_stop_name
-%schedules{ :type => "array" }
+-# %schedules{ :type => "array" }
   - trip.schedules.each do |sch|
     %schedule
       %start_date= sch["start_date"]
       %end_date= sch["end_date"]
       %day_type{:type => "integer"}= sch["day_type"]
 %stop_times{ :type => "array" }
-  - trip.stops.each do |stop_time_item|
+  - trip.stop_times.each do |stop_time_item|
     %stop_time
       %arrival_time= stop_time_item["arrival_time"]
       %departure_time= stop_time_item["departure_time"]
       %stop_sequence{:type => "integer"}= stop_time_item["stop_sequence"]
-      %stop{ :uri => url_for(:controller => :stops, :action => "show", :id => stop_time_item["stop_code"])}
-        %stop_name= stop_time_item["stop_name"]
-        %stop_id= stop_time_item["stop_id"]
-        %stop_code= stop_time_item["stop_code"]
+      %stop{ :uri => url_for(:controller => :stops, :action => "show", :id => stop_time_item.stop_id )}
+        %stop_name= stop_time_item.stop.stop_name
+        %stop_id= stop_time_item.stop_id
+        %stop_code= stop_time_item.stop.stop_code

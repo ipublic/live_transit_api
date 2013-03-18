@@ -1,7 +1,7 @@
 class TripsController < ApplicationController
-  before_filter :authenticate_user!
+  # before_filter :authenticate_user!
   def show
-    @trip = Trip.by_trip_id(:key => params[:id]).first
+    @trip = Trip.find_by_trip_id(params[:id])
 
     if @trip
     respond_to do |format|

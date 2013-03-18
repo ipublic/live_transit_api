@@ -9,9 +9,13 @@
 "first_stop_name" : <%=json trip.trip_id %>,
 "last_stop_name" : <%=json trip.trip_id %>,
 "uri": <%=json url_for(trip) %>,
-"schedules" : [
-  <%= render :partial => "schedules/schedule", :collection => trip.schedules, :spacer_template => "shared/json_spacer" %>
-],
+<%
+  #"schedules" : [
+%>
+<% #render :partial => "schedules/schedule", :collection => trip.schedules, :spacer_template => "shared/json_spacer" %>
+<%
+  #],
+%>
 "stop_times" : [
-  <%= render :partial => "stop_times/stop_time", :collection => trip.stops, :spacer_template => "shared/json_spacer" %>
+  <%= render :partial => "stop_times/stop_time", :collection => trip.stop_times, :spacer_template => "shared/json_spacer" %>
 ]
