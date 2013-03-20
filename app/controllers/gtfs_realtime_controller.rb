@@ -1,5 +1,5 @@
 class GtfsRealtimeController < ApplicationController
-  before_filter :authenticate_user!
+  # before_filter :authenticate_user!
   def show
     @lookup_time, @gtfs_realtime = Gtfs::RealtimeFeed.fetch
 

@@ -3,7 +3,29 @@
   - cache("route_show_xml_#{@route.route_id}") do
     = render :partial => "routes/route", :object => @route
     %trips{ :type => "array" }
-      = render :partial => "trips/trip_item", :collection => @route.trips
+      - @route.trips.each do |trip|
+        %route{ :uri => url_for(:controller => :routes, :action => :show, :id => trip.route_id) }
+          %route_id= trip.route_id
+        %trip_id= trip.trip_id
+        %trip_headsign= trip.trip_headsign
+        %trip_short_name= trip.trip_short_name
+        %shape_id= trip.shape_id
+        %service_id= trip.service_id
+        %direction_id= trip.direction_id
+        %start_time= trip.start_time
+        %end_time= trip.end_time
+        %first_stop_name= trip.first_stop_name
+        %last_stop_name= trip.last_stop_name
+        %stop_times{ :type => "array" }
+          - trip.stop_times.each do |stop_time_item|
+            %stop_time
+              %arrival_time= stop_time_item["arrival_time"]
+              %departure_time= stop_time_item["departure_time"]
+              %stop_sequence{:type => "integer"}= stop_time_item["stop_sequence"]
+              %stop{ :uri => url_for(:controller => :stops, :action => "show", :id => stop_time_item.stop_id )}
+                %stop_name= stop_time_item.stop.stop_name
+                %stop_id= stop_time_item.stop_id
+                %stop_code= stop_time_item.stop.stop_code
     %shapes{ :type => "array" }
       - @route.shapes.each do |shape|
         != shape.to_xml({:root => "shape", :skip_instruct => true})
