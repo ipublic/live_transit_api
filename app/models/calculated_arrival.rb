@@ -24,13 +24,17 @@ class CalculatedArrival
     cas = stes.map do |ste|
       CalculatedArrival.new(ste, vp_blocks[ste.trip.block_id]) 
     end
-    cas.reject { |ca| ca.comparison_time < calc_time.to_i }
+    cas.reject do |ca| 
+      ca.vehicle_already_past? ||
+        (ca.comparison_time < calc_time.to_i)
+    end
   end
 
   def initialize(ste, vp)
     @attributes = {}
     @attributes[:stop_time_id] = ste.stop_time_id
     @attributes[:vehicle_id] = vp.vehicle_id
+    @attributes[:vehicle_trip_id] = vp.trip_id
     @attributes[:trip_id] = ste.trip.trip_id
     @attributes[:route_short_name] = ste.route.route_short_name
     @attributes[:route_name] = ste.route.route_long_name
@@ -44,6 +48,12 @@ class CalculatedArrival
     @attributes[:scheduled_display_time] = Time.at(@attributes[:scheduled_time]).strftime("%l:%M%p")
     @attributes[:calculated_display_time] = Time.at(@attributes[:calculated_arrival_time]).strftime("%l:%M%p")
     @attributes[:message] = "#{@attributes[:calculated_display_time]} #{@attributes[:trip_headsign]} to #{ste.trip.last_stop_name}"
+
+    @attributes[:vehicle_already_past] = (ste.trip.trip_id == vp.trip_id) && (ste.stop_time.stop_sequence < vp.previous_sequence) 
+  end
+
+  def vehicle_already_past?
+    @attributes[:vehicle_already_past]
   end
 
   def [](key)
