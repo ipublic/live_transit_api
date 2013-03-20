@@ -7,16 +7,22 @@ class CalculatedArrival
     vp = VehiclePosition.all(:include_docs => true).docs.reject do |v|
       (v.predicted_deviation == 63) || (v.latest_report_time < reporting_cutoff)
     end
-    vp_trips = vp.inject({}) do |memo, vp|
-      memo[vp.trip_id] = vp
+    vp_trips = vp.map { |vp| vp.trip_id }.uniq
+    vp_trip_models = Trip.by_trip_ids(vp_trips)
+    vp_block_map = vp_trip_models.inject({}) do |memo, t|
+      memo[t.trip_id] = t.block_id
+      memo
+    end
+    vp_blocks = vp.inject({}) do |memo, vp|
+      memo[vp_block_map[vp.trip_id]] = vp
       memo
     end
     max_dev = (vp.map { |v| v.predicted_deviation.abs }.max) * 60
     start_time = calc_time.to_i - max_dev - 30
     end_time = (calc_time + 3.hours).to_i
-    stes = StopTimeEvent.for_stop_and_trips_between(stop_id, vp_trips.keys, start_time, end_time)
+    stes = StopTimeEvent.for_stop_and_blocks_between(stop_id, vp_block_map.values.uniq, start_time, end_time)
     cas = stes.map do |ste|
-      CalculatedArrival.new(ste, vp_trips[ste.trip.trip_id]) 
+      CalculatedArrival.new(ste, vp_blocks[ste.trip.block_id]) 
     end
     cas.reject { |ca| ca.comparison_time < calc_time.to_i }
   end

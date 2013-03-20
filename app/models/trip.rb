@@ -1,7 +1,11 @@
 class Trip < ActiveRecord::Base
-  has_many :stop_times, :foreign_key => "trip_id", :primary_key => "trip_id", :order => "stop_sequence"
+  has_many :stop_times, :foreign_key => "trip_id", :primary_key => "trip_id", :order => "stop_sequence", :inverse_of => :trip
   belongs_to :route, :foreign_key => "route_id", :primary_key => "route_id"
   has_many :shape_points, :foreign_key => "shape_id", :primary_key => "shape_id", :order => "shape_pt_sequence"
+
+  scope :by_trip_ids, lambda { |t_ids|
+    where("trip_id in (?)", t_ids)
+  }
 
   def geometry
     trip_points = shape_points.map do |p|
