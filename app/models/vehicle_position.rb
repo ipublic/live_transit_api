@@ -28,7 +28,7 @@ class VehiclePosition < CouchRest::Model::Base
   end
 
   def latest_report_time
-    [last_position_time].max
+    [last_position_time, last_event_time].max
   end
 
   def last_event_time
@@ -71,7 +71,11 @@ class VehiclePosition < CouchRest::Model::Base
   end
 
   def parse_mssql_date_time(dt_val)
-    Time.strptime(dt_val, "%FT%T%:z")
+    begin
+      Time.strptime(dt_val, "%FT%T%:z")
+    rescue
+      Time.strptime(dt_val, "%FT%T.%L%:z")
+    end
   end
 
   def get_offset(t_val)

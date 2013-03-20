@@ -21,6 +21,6 @@ class ScheduledOnlyArrival < SignArrival
   end
 
   def time
-    @scheduled_arrival[:scheduled_time]
+    @scheduled_arrival[:arrival_time]
   end
 end

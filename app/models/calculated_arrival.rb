@@ -1,51 +1,43 @@
 class CalculatedArrival
   attr_reader :attributes
 
-  def self.all
-    vehicles = VehiclePosition.by_trip_with_deviation(:include_docs => true).docs
-    self.calculate_for_vehicles(vehicles)
-  end
-
   def self.find_for_stop_and_now(stop_id)
-    stop_trip_ids = StopTime.trip_ids_for_stop(stop_id)
-    vehicles = VehiclePosition.by_trip_with_deviation(:keys => stop_trip_ids.uniq, :include_docs => true).docs
-    result = self.calculate_for_vehicles(vehicles)
-    result.select do |ca|
-      (ca["stop_id"] == stop_id)
+    calc_time = Time.now
+    reporting_cutoff = calc_time - 30.minutes
+    vp = VehiclePosition.all(:include_docs => true).docs.reject do |v|
+      (v.predicted_deviation == 63) || (v.latest_report_time < reporting_cutoff)
     end
+    vp_trips = vp.inject({}) do |memo, vp|
+      memo[vp.trip_id] = vp
+      memo
+    end
+    max_dev = (vp.map { |v| v.predicted_deviation.abs }.max) * 60
+    start_time = calc_time.to_i - max_dev - 30
+    end_time = (calc_time + 3.hours).to_i
+    stes = StopTimeEvent.for_stop_and_trips_between(stop_id, vp_trips.keys, start_time, end_time)
+    cas = stes.map do |ste|
+      CalculatedArrival.new(ste, vp_trips[ste.trip.trip_id]) 
+    end
+    cas.reject { |ca| ca.comparison_time < calc_time.to_i }
   end
 
-  def self.calculate_for_vehicles(vehicles)
-    trip_ids = vehicles.map(&:trip_id)
-    found_trips = Trip.trip_collection_with_stops(trip_ids)
-    route_names = Route.route_collection(found_trips.map(&:route_id)).inject({}) do |h, r|
-      h[r.route_id] = r
-      h
-    end
-    vehicle_trips = found_trips.inject({}) { |memo, val| memo[val.trip_id] = val; memo }
-    vehicle_stuff = (vehicles.map do |v|
-      v.calculate_adjusted_stops(vehicle_trips[v.trip_id])
-    end).flatten
-    vehicle_stuff.map do |ast|
-      CalculatedArrival.new(vehicle_trips[ast["trip_id"]], route_names, ast)
-    end
-  end
-
-  def initialize(trip, route_names, attr = {})
-    @attributes = attr.dup
-    @attributes[:stop_time_id] = attr["_id"]
-    @attributes[:vehicle_id] = attr["vehicle_id"]
-    @attributes[:trip_id] = trip.trip_id
-    @attributes[:route_short_name] = route_names[trip.route_id].route_short_name
-    @attributes[:route_name] = route_names[trip.route_id].route_long_name
-    @attributes[:route_id] = trip.route_id
-    @attributes[:destination_stop_name] = trip.last_stop_name
-    @attributes[:trip_headsign] = trip.trip_headsign
-    @attributes[:scheduled_time] = attr["scheduled_time"]
-    @attributes[:calculated_time] = attr["calculated_time"]
-    @attributes[:scheduled_display_time] = attr["scheduled_time"].strftime("%l:%M%p") # for some reason super expensive
-    @attributes[:calculated_display_time] = attr["calculated_time"].strftime("%l:%M%p") # for some reason super expensive
-    @attributes[:message] = "#{@attributes[:calculated_display_time]} #{@attributes[:trip_headsign]} to #{trip.last_stop_name}"
+  def initialize(ste, vp)
+    @attributes = {}
+    @attributes[:stop_time_id] = ste.stop_time_id
+    @attributes[:vehicle_id] = vp.vehicle_id
+    @attributes[:trip_id] = ste.trip.trip_id
+    @attributes[:route_short_name] = ste.route.route_short_name
+    @attributes[:route_name] = ste.route.route_long_name
+    @attributes[:route_id] = ste.trip.route_id
+    @attributes[:destination_stop_name] = ste.trip.last_stop_name
+    @attributes[:trip_headsign] = ste.trip.trip_headsign
+    @attributes[:scheduled_time] = ste.arrival_time
+    @attributes[:predicted_deviation] = vp.predicted_deviation
+    @attributes[:calculated_arrival_time] = ste.arrival_time - (vp.predicted_deviation * 60)
+    @attributes[:calculated_time] = Time.at(@attributes[:calculated_arrival_time])
+    @attributes[:scheduled_display_time] = Time.at(@attributes[:scheduled_time]).strftime("%l:%M%p")
+    @attributes[:calculated_display_time] = Time.at(@attributes[:calculated_arrival_time]).strftime("%l:%M%p")
+    @attributes[:message] = "#{@attributes[:calculated_display_time]} #{@attributes[:trip_headsign]} to #{ste.trip.last_stop_name}"
   end
 
   def [](key)
@@ -58,5 +50,43 @@ class CalculatedArrival
 
   def to_xml(opts = {})
     attributes.to_xml(opts)
+  end
+
+  def comparison_time
+    @attributes[:calculated_arrival_time]
+  end
+
+  def arrival_time
+    @attributes[:calculated_display_time]
+  end
+
+  def headsign
+    @attributes[:trip_headsign]
+  end
+  def predicted_deviation
+    @attributes[:predicted_deviation]
+  end
+
+  def destination
+    @attributes[:destination_stop_name]
+  end
+
+  def on_time?
+    predicted_deviation == 0
+  end
+
+  def adjusted_display_time
+    @attributes[:calculated_diaplay_time]
+  end
+
+  def running_status
+    dev = predicted_deviation
+    if dev < 0
+      "late"
+    elsif dev > 0
+      "early"
+    else
+      "on_time"
+    end
   end
 end
