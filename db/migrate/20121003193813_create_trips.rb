@@ -9,6 +9,7 @@ class CreateTrips < ActiveRecord::Migration
       t.integer :direction_id, :null => true
       t.string :block_id, :limit => 255, :null => false
       t.string :shape_id, :limit => 255, :null => false
+      t.integer :last_stop_sequence, :null => true
     end
     change_table :trips do |t|
       t.foreign_key :routes, :column => :route_id, :primary_key => :route_id
@@ -18,6 +19,7 @@ class CreateTrips < ActiveRecord::Migration
     add_index :trips, :route_id
     add_index :trips, :service_id
     add_index :trips, :shape_id
+    add_index :trips, :last_stop_sequence
   end
 
   def down

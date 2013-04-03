@@ -1,7 +1,18 @@
 require 'csv'
 
+desc "Create DB"
+task :create_import_db => :environment do 
+  db_name = "lta_#{Time.now.strftime("%Y%m%d%H%M%S")}"
+  db_config = ActiveRecord::Base.configurations["production"]
+  new_config = db_config.clone
+  new_config["database"] = db_name
+  create_database(new_config)
+  ActiveRecord::Base.establish_connection(new_config)
+  ActiveRecord::Migrator.migrate("db/migrate", )
+end
+
 desc "Import Data"
-task :import_data => :environment do
+task :import_data => :create_import_db do
   started_at_time = Time.now
   puts "Started at #{started_at_time}"
   spoints = []
@@ -112,6 +123,18 @@ task :import_data => :environment do
   end
   StopTime.import columns, stop_times, :validate => false
   puts "#{total} stop times in"
+  puts "Updating trips with last_stop_sequence"
+  ActiveRecord::Base.connection.execute <<-SQLCODE
+  update trips
+    set last_stop_sequence = blah.last_stop_sequence
+      from
+          (select max(stop_sequence) as last_stop_sequence, trip_id from stop_times group by trip_id) as blah
+            where blah.trip_id = trips.trip_id
+  SQLCODE
+  ActiveRecord::Base.connection.execute <<-SQLCODE
+  alter table trips alter column last_stop_sequence set not null
+  SQLCODE
+  puts "Done updating trips"
   puts "Building stop_time_services"
   ActiveRecord::Base.connection.execute <<-SQLCODE
 insert into stop_time_services

@@ -25,8 +25,8 @@ class Loaders::ServiceProcessor
       )
     end
     @services = normalize_services(@service_records, @exception_records)
-    @keyed_services = Hash.new([])
-    keyed_raw_services = @services.inject(Hash.new([])) do |m, sr|
+    @keyed_services = Hash.new { |k| [] }
+    keyed_raw_services = @services.inject((Hash.new { |k| [] })) do |m, sr|
       m[sr.service_id] = m[sr.service_id] + [sr]
       m
     end
