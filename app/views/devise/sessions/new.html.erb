@@ -1,17 +1,18 @@
-<h2>Sign in</h2>
+<div class="offset4 span4">
+	<%= simple_form_for(resource, :as => resource_name, :url => session_path(resource_name) ) do |f| %>
 
-<%= form_for(resource, :as => resource_name, :url => session_path(resource_name)) do |f| %>
-  <div><%= f.label :email %><br />
-  <%= f.email_field :email %></div>
+		<h2>Please sign in</h2>
+		<%= f.input :email, :label => false, :placeholder => "Email address", :input_html => {:class => 'input-xlarge' } %>
+		<%= f.input :password, :label => false, :placeholder => "Password", :input_html => {:class => 'input-xlarge' } %>
+	
 
-  <div><%= f.label :password %><br />
-  <%= f.password_field :password %></div>
+	  <% if devise_mapping.rememberable? -%>
+			<%= f.input :remember_me, :as => :boolean, :label => false, :inline_label => "Remember Me" %>
+	  <% end -%>
 
-  <% if devise_mapping.rememberable? -%>
-    <div><%= f.check_box :remember_me %> <%= f.label :remember_me %></div>
-  <% end -%>
-
-  <div><%= f.submit "Sign in" %></div>
-<% end %>
-
-<%= render :partial => "devise/shared/links" %>
+	  <div class="form-actions">
+	  	<%= f.submit "Sign in", :class => "btn btn-primary" %>
+		</div>
+		<%= render "devise/shared/links" %>
+	<% end %>
+</div>
