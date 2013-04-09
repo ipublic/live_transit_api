@@ -25,6 +25,7 @@ LiveTransitApi::Application.configure do
   config.action_dispatch.best_standards_support = :builtin
 
   # Expands the lines which load the assets
+  config.assets.compress = false  # Do not compress assets
   config.assets.debug = true
   config.action_mailer.default_url_options = { :host => 'localhost:3000' }
   config.cache_store = :dalli_store, 'localhost', { :namespace => "live_transit_api", :compression => true}
