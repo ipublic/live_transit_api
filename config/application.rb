@@ -34,6 +34,13 @@ module LiveTransitApi
     # Custom directories with classes and modules you want to be autoloadable.
     # config.autoload_paths += %W(#{config.root}/extras)
 
+    # Override the Couch orm settings
+    config.generators do |g|
+      g.orm             :active_record
+      # g.template_engine :erb
+      # g.test_framework  :test_unit, :fixture => true
+    end
+    
     # Only load the plugins named here, in the order given (default is alphabetical).
     # :all can be used as a placeholder for all plugins not explicitly named.
     # config.plugins = [ :exception_notification, :ssl_requirement, :all ]
