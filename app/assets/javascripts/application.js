@@ -6,5 +6,7 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require jquery.ui.datepicker
+//= require chosen-jquery
 //= require twitter/bootstrap
 //= require_tree .

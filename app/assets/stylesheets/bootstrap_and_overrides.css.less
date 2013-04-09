@@ -29,3 +29,12 @@
 //
 // Example:
 // @linkColor: #ff0000;
+
+// Fix Bootstrap aligment problem on blank definitions by appending an &nbsp;
+dl.dl-horizontal {
+    dd:after {
+        content: "\0000a0";
+    }
+}
+
+
