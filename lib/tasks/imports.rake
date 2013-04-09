@@ -11,6 +11,8 @@ task :create_import_db => :environment do
   ActiveRecord::Migrator.migrate("db/migrate", )
 end
 
+namespace :gtfs do
+
 desc "Import Data"
 task :import_data => :environment do
   started_at_time = Time.now
@@ -186,4 +188,6 @@ join trips t on t.trip_id = st.trip_id
   ended_at_time = Time.now
   puts "Started at #{started_at_time}"
   puts "Ended at #{ended_at_time}"
+end
+
 end
