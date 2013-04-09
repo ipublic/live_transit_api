@@ -12,7 +12,7 @@ task :create_import_db => :environment do
 end
 
 desc "Import Data"
-task :import_data => :create_import_db do
+task :import_data => :environment do
   started_at_time = Time.now
   puts "Started at #{started_at_time}"
   spoints = []
