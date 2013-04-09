@@ -17,6 +17,10 @@ gem 'pg', '0.14.1'
 gem 'foreigner', '1.2.1'
 gem 'activerecord-import'
 
+# Add PostGIS functionality.  See http://www.waratuman.com/2012/10/26/postgis_and_rails/
+gem 'rgeo'
+gem 'activerecord-postgis-adapter'
+
 # Bundle edge Rails instead:
 # gem 'rails',     :git => 'git://github.com/rails/rails.git'
 
