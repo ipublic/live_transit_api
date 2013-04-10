@@ -1,5 +1,57 @@
 require 'csv'
 
+def run_sql_with_progress(start_msg, stop_msg, *args)
+  puts start_msg
+  args.each do |sql_str|
+    ActiveRecord::Base.connection.execute(sql_str)
+  end
+  puts stop_msg
+end
+
+def read_csv_headers(import_file)
+  headers = []
+  CSV.open(import_file, {:headers => true}) do |csv|
+    iter = csv.to_enum(:each)
+    headers = iter.next.headers
+  end
+  headers
+end
+
+def import_batch_with_transformation(object_list_type, batch_size, import_file, model_cls, model_headers)
+  recs = []
+  total = 0 
+  puts "Import #{object_list_type}...."
+  CSV.foreach(import_file, {:headers => true}) do |row|
+    total += 1
+    recs << (yield row.fields)
+    if total % batch_size == 0
+      model_cls.import model_headers, recs, :validate => false
+      recs = []
+      puts "#{total} #{object_list_type} in"
+    end
+  end
+  model_cls.import model_headers, recs, :validate => false
+  puts "#{total} #{object_list_type} in"
+end
+
+def import_batch_with_progress(object_list_type, batch_size, import_file, model_cls)
+  header_cols = read_csv_headers(import_file)
+  recs = []
+  total = 0 
+  puts "Import #{object_list_type}...."
+  CSV.foreach(import_file, {:headers => true}) do |row|
+    total += 1
+    recs << row.fields
+    if total % batch_size == 0
+      model_cls.import header_cols, recs, :validate => false
+      recs = []
+      puts "#{total} #{object_list_type} in"
+    end
+  end
+  model_cls.import header_cols, recs, :validate => false
+  puts "#{total} #{object_list_type} in"
+end
+
 desc "Create DB"
 task :create_import_db => :environment do 
   db_name = "lta_#{Time.now.strftime("%Y%m%d%H%M%S")}"
@@ -8,7 +60,7 @@ task :create_import_db => :environment do
   new_config["database"] = db_name
   create_database(new_config)
   ActiveRecord::Base.establish_connection(new_config)
-  ActiveRecord::Migrator.migrate("db/migrate", )
+  ActiveRecord::Migrator.migrate("db/migrate")
 end
 
 namespace :gtfs do
@@ -17,20 +69,7 @@ desc "Import Data"
 task :import_data => :environment do
   started_at_time = Time.now
   puts "Started at #{started_at_time}"
-  spoints = []
-  total = 0 
-  puts "Import shape points..."
-  CSV.foreach("shapes.txt", {:headers => true}) do |row|
-    total += 1
-    spoints << ShapePoint.new(row.to_hash)
-    if total % 5000 == 0
-      ShapePoint.import spoints, :validate => false
-      spoints = []
-      puts "#{total} shape points in"
-    end
-  end
-  ShapePoint.import spoints, :validate => false
-  puts "#{total} shape points in"
+  import_batch_with_progress("shape points", 5000, "shapes.txt", ShapePoint)
   puts "Import schedules"
   agencies = []
   puts "Import agencies...."
@@ -38,34 +77,8 @@ task :import_data => :environment do
     agencies << Agency.new(row.to_hash)
   end
   Agency.import agencies, :validate => false
-  stops = []
-  total = 0 
-  puts "Import stops..."
-  CSV.foreach("stops.txt", {:headers => true}) do |row|
-    total += 1
-    stops << Stop.new(row.to_hash)
-    if total % 1000 == 0
-      Stop.import stops, :validate => false
-      stops = []
-      puts "#{total} stops in"
-    end
-  end
-  Stop.import stops, :validate => false
-  puts "#{total} stops in"
-  routes = []
-  total = 0 
-  puts "Import routes..."
-  CSV.foreach("routes.txt", {:headers => true}) do |row|
-    total += 1
-    routes << Route.new(row.to_hash)
-    if total % 1000 == 0
-      Route.import routes, :validate => false
-      routes = []
-      puts "#{total} routes in"
-    end
-  end
-  Route.import routes, :validate => false
-  puts "#{total} routes in"
+  import_batch_with_progress("stops", 1000, "stops.txt", ::Stop)
+  import_batch_with_progress("routes", 1000, "routes.txt", Route)
   puts "Import schedules"
   sp = Loaders::ServiceProcessor.new(
             "calendar.txt",
@@ -81,73 +94,46 @@ task :import_data => :environment do
   end
   TripDay.import ["service_id", "day"], service_days, :validate => "false"
   puts "#{total} scheduled days in"
-  trips = []
-  columns = []
-  total = 0 
-  puts "Import trips..."
-  CSV.foreach("trips.txt", {:headers => true}) do |row|
-    total += 1
-    trips << row.fields
-    if total % 2500 == 0
-      columns = row.headers
-      Trip.import columns, trips, :validate => false
-      trips = []
-      puts "#{total} trips in"
-    end
-  end
-  Trip.import columns, trips, :validate => false
-  puts "#{total} trips in"
+  columns = read_csv_headers("trips.txt")
+  import_batch_with_progress("trips", 2500, "trips.txt", Trip)
   stop_times = []
   columns = []
   arr_time_idx = 0
   d_time_idx = 0
   total = 0 
   puts "Import stop_times..."
-  CSV.foreach("stop_times.txt", {:headers => true}) do |row|
-    columns = row.headers
-    arr_time_idx = columns.index("arrival_time")
-    d_time_idx = columns.index("departure_time")
-    break
-  end
-  CSV.foreach("stop_times.txt", {:headers => true}) do |row|
-    total += 1
-    field_vals = row.fields
+  st_cols = read_csv_headers("stop_times.txt")
+  arr_time_idx = st_cols.index("arrival_time")
+  d_time_idx = st_cols.index("departure_time")
+  import_batch_with_transformation("stop times", 5000, "stop_times.txt", StopTime, st_cols) do |row|
+    field_vals = row
     at_components = field_vals[arr_time_idx].split(":").map(&:to_i)
     dt_components = field_vals[d_time_idx].split(":").map(&:to_i)
     field_vals[arr_time_idx] = ((at_components[0] * 3600) + (at_components[1] * 60) + at_components[2])
     field_vals[d_time_idx] = ((dt_components[0] * 3600) + (dt_components[1] * 60) + dt_components[2])
-    stop_times << field_vals
-    if total % 5000 == 0
-      StopTime.import columns, stop_times, :validate => false
-      stop_times = []
-      puts "#{total} stop times in"
-    end
+    field_vals
   end
-  StopTime.import columns, stop_times, :validate => false
-  puts "#{total} stop times in"
-  puts "Updating trips with last_stop_sequence"
-  ActiveRecord::Base.connection.execute <<-SQLCODE
-  update trips
-    set last_stop_sequence = blah.last_stop_sequence
+  run_sql_with_progress(
+    "Updating trips with last_stop_sequence",
+    "Done updating trips",
+    <<-SQLCODE,
+      update trips
+      set last_stop_sequence = blah.last_stop_sequence
       from
           (select max(stop_sequence) as last_stop_sequence, trip_id from stop_times group by trip_id) as blah
             where blah.trip_id = trips.trip_id
-  SQLCODE
-  ActiveRecord::Base.connection.execute <<-SQLCODE
-  alter table trips alter column last_stop_sequence set not null
-  SQLCODE
-  puts "Done updating trips"
-  puts "Building stop_time_services"
-  ActiveRecord::Base.connection.execute <<-SQLCODE
-insert into stop_time_services
-select st.id, st.stop_id, t.service_id, st.arrival_time, st.departure_time from stop_times st
-join trips t on t.trip_id = st.trip_id
-  SQLCODE
-  puts "Done stop_time_services"
-  ActiveRecord::Base.connection.execute <<-SQLCODE
-  alter table stop_time_events add column id serial
-  SQLCODE
-  puts "Added stop_time_events id"
+    SQLCODE
+    <<-SQLCODE)
+    alter table trips alter column last_stop_sequence set not null
+    SQLCODE
+  run_sql_with_progress(
+    "Building stop_time_services",
+    "Done stop_time_services",
+    <<-SQLCODE)
+      insert into stop_time_services
+      select st.id, st.stop_id, t.service_id, st.arrival_time, st.departure_time from stop_times st
+      join trips t on t.trip_id = st.trip_id
+    SQLCODE
   puts "Building stop_time_events"
   ActiveRecord::Base.connection.execute <<-SQLCODE
   insert into stop_time_events
@@ -157,6 +143,10 @@ join trips t on t.trip_id = st.trip_id
   SQLCODE
   puts "Done stop_time_events"
   puts "Building stop_time_events primary key"
+  ActiveRecord::Base.connection.execute <<-SQLCODE
+  alter table stop_time_events add column id serial
+  SQLCODE
+  puts "Added stop_time_events id"
   ActiveRecord::Base.connection.execute <<-SQLCODE
   alter table stop_time_events add primary key (id)
   SQLCODE
