@@ -70,7 +70,7 @@ namespace :gtfs do
   task :import_trip_shapes => :environment do
     puts "Importing TripShape features..."
 
-    Features::TripShape.delete_all
+    # Features::TripShape.delete_all
     
     started_at_time = Time.now
     puts "Started at #{started_at_time}"
