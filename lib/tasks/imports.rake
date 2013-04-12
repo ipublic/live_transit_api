@@ -1,4 +1,5 @@
 require 'csv'
+require 'rgeo'
 
 def run_sql_with_progress(start_msg, stop_msg, *args)
   puts start_msg
@@ -64,6 +65,95 @@ task :create_import_db => :environment do
 end
 
 namespace :gtfs do
+
+  desc "Import TripShapes"
+  task :import_trip_shapes => :environment do
+    puts "Importing TripShape features..."
+
+    Features::TripShape.delete_all
+    
+    started_at_time = Time.now
+    puts "Started at #{started_at_time}"
+
+    factory = ::RGeo::Geographic.simple_mercator_factory
+    total = 0
+    dist = 0.0
+    ids = []
+    sequences = [-1]  # Spec states shape_pt_sequence must be positive integer
+    points = []
+    
+    # Optimistic import -- expects file line_strings are adjacent and point sequences are in ascending order
+    CSV.open("shapes.txt", headers: true) do |rec|
+      rec.each do |row|
+        id = row.delete('shape_id')[1].to_s
+        ids = [] << id if ids.length == 0
+        sequence = row.delete('shape_pt_sequence')[1].to_i
+        pt = factory.point(row.delete('shape_pt_lon')[1], row.delete('shape_pt_lat')[1])
+#        puts pt.to_s
+
+        if id != ids.last
+          raise "Found multiple non-adjacent line_string points for shape_id: #{id}" if ids.include?(id) 
+
+          # Change in shape_id indicates new line_string, write pending line_string to db
+          geometry = factory.line_string(points)
+          Features::TripShape.create!({trip_shape_id: ids.last}.merge({trip_shape_dist_traveled: dist}).merge({geometry: geometry}))
+          total += 1
+          puts "#{total} Write line_string: trip_shape_id=#{ids.last}  trip_shape_dist_traveled=#{dist} num_points=#{geometry.num_points}"
+
+          ids << id
+          points = [] << pt
+          sequences = [-1] << sequence
+          dist = row.delete('shape_dist_traveled')[1].to_f  # Should always be 0 as this is first point
+        else
+          raise "Found out-of-order shape_pt_sequence for shape_id: #{id}, #{sequences}" unless sequence > sequences.last
+
+          # Append point to current line_string
+          points << pt
+          sequences << sequence
+          dist += row.delete('shape_dist_traveled')[1].to_f        
+        end
+      end
+
+      # Reached end of file - write final feature
+      geometry = factory.line_string(points)
+      Features::TripShape.create!({trip_shape_id: ids.last}.merge({trip_shape_dist_traveled: dist}).merge({geometry: geometry}))
+      total += 1
+      puts "#{total} Write line_string: trip_shape_id=#{ids.last}  trip_shape_dist_traveled=#{dist} num_points=#{geometry.num_points}"
+    end
+      
+    puts "#{total} TripShape features imported"
+
+    ended_at_time = Time.now
+    puts "Started at #{started_at_time}"
+    puts "Ended at #{ended_at_time}"
+  end
+
+  desc "Import Bus Stops"
+  task :import_bus_stops => :environment do
+    puts "Importing Stop features..."
+    # Features::Stop.delete_all
+
+    started_at_time = Time.now
+    puts "Started at #{started_at_time}"
+
+    factory = ::RGeo::Geographic.simple_mercator_factory
+    total = 0 
+
+    CSV.foreach("stops.txt", headers: true) do |row|
+      point = factory.point(row.delete('stop_lon')[1], row.delete('stop_lat')[1])
+      
+      geometry = {geometry: point}
+      Features::Stop.create! row.to_hash.merge(geometry)
+      total += 1
+      puts "#{total} Write point: stop_id=#{row['stop_id']} long=#{point.x}  lat=#{point.y}"
+    end
+    puts "#{total} Stops features imported"
+
+    ended_at_time = Time.now
+    puts "Started at #{started_at_time}"
+    puts "Ended at #{ended_at_time}"
+  end
+
 
 desc "Import Data"
 task :import_data => :environment do
