@@ -1,9 +1,7 @@
 class Trip < ActiveRecord::Base
   has_many :stop_times, :foreign_key => "trip_id", :primary_key => "trip_id", :order => "stop_sequence", :inverse_of => :trip
   belongs_to :route, :foreign_key => "route_id", :primary_key => "route_id"
-  # has_many :shape_points, :foreign_key => "shape_id", :primary_key => "shape_id", :order => "shape_pt_sequence"
-  belongs_to :trip_shape, foreign_key: "trip_shape_id", primary_key: "trip_shape_id", class_name: => "Features::TripShape"
-
+  has_many :shape_points, :foreign_key => "shape_id", :primary_key => "shape_id", :order => "shape_pt_sequence"
 
   scope :by_trip_ids, lambda { |t_ids|
     where("trip_id in (?)", t_ids)

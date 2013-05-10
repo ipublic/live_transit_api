@@ -2,7 +2,7 @@ class CreateFeaturesStops < ActiveRecord::Migration
   def change
     create_table :features_stops do |t|
 	    t.string :stop_id, null: false
-      t.point :geometry, geographic: true, null: false
+      t.point :stop_latlon, geographic: true, null: false
 	    t.string :stop_code, null: true
 	    t.string :stop_name, null: false
 	    t.text :stop_desc
@@ -17,7 +17,7 @@ class CreateFeaturesStops < ActiveRecord::Migration
     end
     
     change_table :features_stops do |t|
-      t.index :geometry, spatial: true
+      t.index :stop_latlon, spatial: true
     end
 
     add_index :features_stops, :stop_id, unique: true

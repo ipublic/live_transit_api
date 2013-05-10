@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130410005906) do
+ActiveRecord::Schema.define(:version => 20130409213611) do
 
   create_table "agencies", :force => true do |t|
     t.string "agency_id"
@@ -25,7 +25,7 @@ ActiveRecord::Schema.define(:version => 20130410005906) do
 
   create_table "features_stops", :force => true do |t|
     t.string   "stop_id",                                                                                        :null => false
-    t.spatial  "geometry",            :limit => {:srid=>4326, :type=>"point", :geographic=>true},                :null => false
+    t.spatial  "stop_latlon",         :limit => {:srid=>4326, :type=>"point", :geographic=>true},                :null => false
     t.string   "stop_code"
     t.string   "stop_name",                                                                                      :null => false
     t.text     "stop_desc"
@@ -37,14 +37,6 @@ ActiveRecord::Schema.define(:version => 20130410005906) do
     t.integer  "wheelchair_boarding",                                                             :default => 0
     t.datetime "created_at",                                                                                     :null => false
     t.datetime "updated_at",                                                                                     :null => false
-  end
-
-  create_table "features_trip_shapes", :force => true do |t|
-    t.string   "trip_shape_id",                                                                                               :null => false
-    t.spatial  "geometry",                 :limit => {:srid=>4326, :type=>"line_string", :geographic=>true},                  :null => false
-    t.float    "trip_shape_dist_traveled",                                                                   :default => 0.0
-    t.datetime "created_at",                                                                                                  :null => false
-    t.datetime "updated_at",                                                                                                  :null => false
   end
 
   create_table "routes", :force => true do |t|
@@ -67,7 +59,7 @@ ActiveRecord::Schema.define(:version => 20130410005906) do
     t.float   "shape_dist_traveled"
   end
 
-  create_table "stop_time_events", :id => false, :force => true do |t|
+  create_table "stop_time_events", :force => true do |t|
     t.integer "stop_time_id",   :null => false
     t.string  "stop_id",        :null => false
     t.integer "arrival_time"
@@ -123,7 +115,7 @@ ActiveRecord::Schema.define(:version => 20130410005906) do
     t.integer "direction_id"
     t.string  "block_id",                          :null => false
     t.string  "shape_id",                          :null => false
-    t.integer "last_stop_sequence"
+    t.integer "last_stop_sequence",                :null => false
   end
 
 end
