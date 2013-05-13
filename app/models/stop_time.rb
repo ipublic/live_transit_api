@@ -5,4 +5,5 @@ class StopTime < ActiveRecord::Base
   has_many :stop_time_events, :foreign_key => "stop_time_id", :primary_key => "stop_time_id"
 
   delegate :route, :to => :trip
+  delegate :block_id, :to => :trip
 end

@@ -1,1 +1,1 @@
-TRANSIT_TIME_ZONE = "Pacific Time (US & Canada)"
+TRANSIT_TIME_ZONE = "Eastern Time (US & Canada)"
