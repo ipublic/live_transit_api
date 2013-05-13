@@ -60,18 +60,29 @@ end
 
 namespace :gtfs do
 
-  desc "Import Schedules"
-  task :import_schedules => :environment do
-    puts "Import schedules"
+  desc "Import Agencies"
+  task :import_agencies => :environment do
     agencies = []
     puts "Import agencies...."
     CSV.foreach("agency.txt", {:headers => true}) do |row|
       agencies << Agency.new(row.to_hash)
     end
     Agency.import agencies, :validate => false
+  end
+
+  desc "Import Stops"
+  task :import_stops => :environment do
     import_batch_with_progress("stops.txt", ::Stop)
-    import_batch_with_progress("routes.txt", Route)
-    puts "Import schedules"
+  end
+
+  desc "Import Shapes"
+  task :import_shapes => :environment do
+    import_batch_with_progress("shapes.txt", ShapePoint, batch_size: 5000)
+  end
+
+  desc "Import Calendars"
+  task :import_calendars => "gtfs:import_agencies" do
+    puts "Import Calendars"
     sp = Loaders::ServiceProcessor.new(
       "calendar.txt",
       "calendar_dates.txt"
@@ -79,16 +90,22 @@ namespace :gtfs do
     TripDay.import ["service_id", "day"], sp.enumerated_days, :validate => "false"
     total = sp.enumerated_days.length
     puts "#{total} scheduled days in"
-
   end
 
-  desc "Import Data"
-  task :import_data => "gtfs:import_schedules" do
-    started_at_time = Time.now
-    puts "Started at #{started_at_time}"
-    import_batch_with_progress("shapes.txt", ShapePoint, batch_size: 5000)
-    columns = read_csv_headers("trips.txt")
+  desc "Import Routes"
+  task :import_routes => "gtfs:import_agencies" do
+    import_batch_with_progress("routes.txt", Route)
+  end
+
+
+  desc "Import Trips"
+  task :import_trips => "gtfs:import_routes", "gtfs:import_calendars", "gtfs:import_shapes"
     import_batch_with_progress("trips.txt", Trip)
+  end
+
+  desc "Import StopTimes"
+  task :import_stop_times => "gtfs:import_trips", "gtfs:import_routes", "gtfs_import_stops" do
+    columns = read_csv_headers("trips.txt")
     st_cols = read_csv_headers("stop_times.txt")
     arr_time_idx = st_cols.index("arrival_time")
     d_time_idx = st_cols.index("departure_time")
@@ -112,6 +129,12 @@ namespace :gtfs do
       alter table trips alter column last_stop_sequence set not null
       SQLCODE
     end
+  end
+
+  desc "Import Data"
+  task :import_data => "gtfs:import_stop_times" do
+    started_at_time = Time.now
+    puts "Started at #{started_at_time}"
     with_timed_connection("Building stop_time_services") do |c|
       c.execute(<<-SQLCODE)
       insert into stop_time_services
