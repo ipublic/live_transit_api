@@ -20,6 +20,6 @@ class Loaders::ServiceRecord
   end
 
   def parse_out_date(val)
-    val.kind_of?(Date) ? val : Date.strptime(val, "%Y%m%d")
+    val.kind_of?(Date) ? val : Time.zone.parse(val, "%Y%m%d")
   end
 end
