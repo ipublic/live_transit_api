@@ -99,12 +99,12 @@ namespace :gtfs do
 
 
   desc "Import Trips"
-  task :import_trips => "gtfs:import_routes", "gtfs:import_calendars", "gtfs:import_shapes"
+  task :import_trips => ["gtfs:import_routes", "gtfs:import_calendars", "gtfs:import_shapes"] do
     import_batch_with_progress("trips.txt", Trip)
   end
 
   desc "Import StopTimes"
-  task :import_stop_times => "gtfs:import_trips", "gtfs:import_routes", "gtfs_import_stops" do
+  task :import_stop_times => ["gtfs:import_trips", "gtfs:import_routes", "gtfs:import_stops"] do
     columns = read_csv_headers("trips.txt")
     st_cols = read_csv_headers("stop_times.txt")
     arr_time_idx = st_cols.index("arrival_time")

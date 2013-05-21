@@ -13,17 +13,38 @@ class StopTimeEvent < ActiveRecord::Base
       joins(:stop, {:stop_time => [:stop, { :trip => :route }]})
   }
 
-  scope :for_arrival_time_with_blocks, lambda { |n_val, s_val, e_val, block_ids|
+  scope :for_stops_and_arrival_time_with_blocks, lambda { |stop_ids, n_val, s_val, e_val, block_ids|
     joins({:stop_time => [{ :trip => :route }, :stop]}, :stop).
-      where("stop_times.stop_sequence <> trips.last_stop_sequence and (
+      where("stop_time_events.stop_id in (?) and
+            stop_times.stop_sequence <> trips.last_stop_sequence and (
+            (
             (stop_time_events.arrival_time > ? and stop_time_events.arrival_time < ?)
+            AND
+            (trips.block_id not in (?))
+            )
             OR (
             (stop_time_events.arrival_time > ? and stop_time_events.arrival_time < ?)
             AND
             (trips.block_id in (?))
-            ))", n_val, e_val, s_val, e_val, block_ids).
-    includes({:stop_time => [{ :trip => :route }, :stop]}, :stop).
-      order("stop_time_events.arrival_time")
+            ))", stop_ids, n_val, e_val, block_ids, s_val, e_val, block_ids).
+    includes({:stop_time => [{ :trip => :route }, :stop]}, :stop)
+  }
+
+  scope :for_arrival_time_with_blocks, lambda { |n_val, s_val, e_val, block_ids|
+    joins({:stop_time => [{ :trip => :route }, :stop]}, :stop).
+      where("stop_times.stop_sequence <> trips.last_stop_sequence and (
+            (
+            (stop_time_events.arrival_time > ? and stop_time_events.arrival_time < ?)
+            AND
+            (trips.block_id not in (?))
+            )
+            OR (
+            (stop_time_events.arrival_time > ? and stop_time_events.arrival_time < ?)
+            AND
+            (trips.block_id in (?))
+            ))", n_val, e_val, block_ids, s_val, e_val, block_ids).
+    includes({:stop_time => [{ :trip => :route }, :stop]}, :stop) #.
+      # order("stop_time_events.arrival_time")
   }
 
   scope :for_stop_and_blocks_between, lambda { |s_id, b_ids, s_val, e_val|

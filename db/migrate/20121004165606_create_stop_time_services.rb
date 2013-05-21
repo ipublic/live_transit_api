@@ -3,7 +3,7 @@ class CreateStopTimeServices < ActiveRecord::Migration
     create_table :stop_time_services, { :id => false } do |t|
       t.integer :stop_time_id, :null => false
       t.string :stop_id, :limit => 255, :null => false
-      t.integer :service_id, :null => false
+      t.string :service_id, :limit => 128, :null => false
       t.integer :arrival_time
       t.integer :departure_time
     end
