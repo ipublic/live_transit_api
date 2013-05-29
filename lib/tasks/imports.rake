@@ -1,4 +1,37 @@
 require 'csv'
+require 'fileutils'
+
+module Rake
+
+  class ResumableTask < Task
+      def name_file
+        File.join(Rake.application.original_dir, name.gsub(":", "_") + ".task_completed")
+      end
+
+      def define_task(*args, &block)
+        Rake.application.define_task(self, *args, &block)
+      end
+
+      def needed?
+        !File.exists?(name_file)
+      end
+
+      def execute(args=nil)
+        super(args)
+        FileUtils.touch(name_file)
+      end
+  end
+
+  module DSL
+    private
+    def resumable_task(*args, &block)
+      Rake::ResumableTask.define_task(*args, &block)
+    end
+  end
+
+end
+
+
 
 def with_timed_connection(action = "SQL statment")
     puts "Starting: #{action}"
@@ -61,7 +94,7 @@ end
 namespace :gtfs do
 
   desc "Import Agencies"
-  task :import_agencies => :environment do
+  resumable_task :import_agencies => :environment do
     agencies = []
     puts "Import agencies...."
     CSV.foreach("agency.txt", {:headers => true}) do |row|
@@ -71,17 +104,17 @@ namespace :gtfs do
   end
 
   desc "Import Stops"
-  task :import_stops => :environment do
+  resumable_task :import_stops => :environment do
     import_batch_with_progress("stops.txt", ::Stop)
   end
 
   desc "Import Shapes"
-  task :import_shapes => :environment do
+  resumable_task :import_shapes => :environment do
     import_batch_with_progress("shapes.txt", ShapePoint, batch_size: 5000)
   end
 
   desc "Import Calendars"
-  task :import_calendars => "gtfs:import_agencies" do
+  resumable_task :import_calendars => "gtfs:import_agencies" do
     puts "Import Calendars"
     sp = Loaders::ServiceProcessor.new(
       "calendar.txt",
@@ -93,18 +126,18 @@ namespace :gtfs do
   end
 
   desc "Import Routes"
-  task :import_routes => "gtfs:import_agencies" do
+  resumable_task :import_routes => "gtfs:import_agencies" do
     import_batch_with_progress("routes.txt", Route)
   end
 
 
   desc "Import Trips"
-  task :import_trips => ["gtfs:import_routes", "gtfs:import_calendars", "gtfs:import_shapes"] do
+  resumable_task :import_trips => ["gtfs:import_routes", "gtfs:import_calendars", "gtfs:import_shapes"] do
     import_batch_with_progress("trips.txt", Trip)
   end
 
   desc "Import StopTimes"
-  task :import_stop_times => ["gtfs:import_trips", "gtfs:import_routes", "gtfs:import_stops"] do
+  resumable_task :import_stop_times => ["gtfs:import_trips", "gtfs:import_routes", "gtfs:import_stops"] do
     columns = read_csv_headers("trips.txt")
     st_cols = read_csv_headers("stop_times.txt")
     arr_time_idx = st_cols.index("arrival_time")
@@ -132,7 +165,7 @@ namespace :gtfs do
   end
 
   desc "Import Data"
-  task :import_data => "gtfs:import_stop_times" do
+  resumable_task :import_data => "gtfs:import_stop_times" do
     started_at_time = Time.now
     puts "Started at #{started_at_time}"
     with_timed_connection("Building stop_time_services") do |c|
